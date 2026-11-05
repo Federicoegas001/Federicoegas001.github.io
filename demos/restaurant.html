@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RestaurantApp · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#f7f1e8; --card:#fffaf2; --ink:#2a1d14; --muted:#7b6a5c; --line:#e6d9c7;
+  --tomato:#c8361d; --basil:#2f6b3a; --display:"Fraunces",Georgia,serif; --body:"Work Sans",system-ui,sans-serif;
+  /* layout: menú a la izquierda, carrito fijo a la derecha; admin = tabla */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 120px}
+.top{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font:700 40px/1 var(--display);margin:0;letter-spacing:-.5px}
+h1 small{display:block;font:500 13px var(--body);letter-spacing:2px;text-transform:uppercase;color:var(--tomato);margin-bottom:8px}
+.roles{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
+.roles button{border:0;background:transparent;padding:8px 16px;border-radius:999px;font:600 14px var(--body);color:var(--muted);cursor:pointer}
+.roles button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cats button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font:500 13px var(--body);cursor:pointer;color:var(--ink)}
+.cats button[aria-pressed="true"]{border-color:var(--tomato);color:var(--tomato)}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.dish{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.dish .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:700 18px var(--display);color:#fff}
+.dish h3{margin:0;font:600 19px/1.2 var(--display)}
+.dish p{margin:0;color:var(--muted);font-size:13.5px;flex:1}
+.dish .row{display:flex;align-items:center;justify-content:space-between}
+.price{font:600 16px var(--body);font-variant-numeric:tabular-nums}
+.add{border:0;background:var(--tomato);color:#fff;border-radius:10px;padding:8px 12px;font:600 13px var(--body);cursor:pointer}
+.add:disabled{background:#cdbfae;cursor:not-allowed}
+.off{opacity:.55}
+.cart{position:sticky;top:96px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.cart h2,.panel h2{font:700 22px var(--display);margin:0 0 12px}
+.line{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600}
+.total{display:flex;justify-content:space-between;margin:14px 0;font:600 18px var(--body);font-variant-numeric:tabular-nums}
+.cta{width:100%;border:0;background:var(--ink);color:#fff;border-radius:12px;padding:12px;font:600 15px var(--body);cursor:pointer}
+.cta:disabled{opacity:.4;cursor:not-allowed}
+.empty{color:var(--muted);font-size:14px;padding:10px 0}
+.orders{margin-top:28px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:20px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font:600 12px var(--body);text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font:600 12px var(--body)}
+.PENDIENTE{background:#fde7c8;color:#8a5300}.EN_PREPARACION{background:#dbe8ff;color:#1d4aa8}.LISTO{background:#dff2e2;color:var(--basil)}.ENTREGADO{background:#ece6dd;color:#5d5045}
+select,.sw{font:500 13px var(--body)}
+select{padding:6px;border-radius:8px;border:1px solid var(--line);background:#fff}
+.sw{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;cursor:pointer}
+.sw[aria-pressed="true"]{background:var(--basil);border-color:var(--basil);color:#fff}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;z-index:950}
+.toast.show{opacity:1}
+button:focus-visible,select:focus-visible{outline:2px solid var(--tomato);outline-offset:2px}
+[hidden]{display:none!important}
+@media (max-width:860px){.grid{grid-template-columns:1fr}.cart{position:static}}
+</style>
+</head>
+<body data-title="RestaurantApp" data-sub="Pedidos online para restaurante" data-stack="Java 17,Spring Boot 3.5,Spring Security,MySQL,React,Tailwind" data-repo="https://github.com/Federicoegas001/restaurant-app">
+<div class="wrap">
+  <div class="top">
+    <h1><small>Trattoria del Puerto</small>Menú del día</h1>
+    <div class="roles" role="group" aria-label="Rol">
+      <button id="r-cli" aria-pressed="true">Cliente</button>
+      <button id="r-adm" aria-pressed="false">Administrador</button>
+    </div>
+  </div>
+
+  <section id="v-cli">
+    <div class="grid">
+      <div>
+        <div class="cats" id="cats"></div>
+        <div class="menu" id="menu"></div>
+        <div class="orders panel">
+          <h2>Mis pedidos</h2>
+          <div id="mine"></div>
+        </div>
+      </div>
+      <aside class="cart">
+        <h2>Tu pedido</h2>
+        <div id="cart"></div>
+        <div class="total"><span>Total</span><span id="tot">$ 0</span></div>
+        <button class="cta" id="confirm" disabled>Confirmar pedido</button>
+      </aside>
+    </div>
+  </section>
+
+  <section id="v-adm" hidden>
+    <div class="panel">
+      <h2>Pedidos entrantes</h2>
+      <table><thead><tr><th>#</th><th>Cliente</th><th>Items</th><th>Total</th><th>Estado</th><th>Cambiar estado</th></tr></thead><tbody id="all"></tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Platos</h2>
+      <table><thead><tr><th>Plato</th><th>Categoría</th><th>Precio</th><th>Disponible</th></tr></thead><tbody id="dishes"></tbody></table>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="../assets/kit.js"></script>
+<script>
+const platos=[
+  {id:1,n:"Fugazzeta rellena",c:"Pizzas",p:14500,d:"Muzzarella, cebolla y orégano. 8 porciones.",col:"#c8361d",ok:true},
+  {id:2,n:"Napolitana",c:"Pizzas",p:13200,d:"Tomate en rodajas, ajo y albahaca fresca.",col:"#c8361d",ok:true},
+  {id:3,n:"Sorrentinos de jamón y queso",c:"Pastas",p:11800,d:"Con salsa fileto o crema.",col:"#b9862a",ok:true},
+  {id:4,n:"Ñoquis de papa",c:"Pastas",p:9900,d:"Caseros, con tuco de la casa.",col:"#b9862a",ok:true},
+  {id:5,n:"Milanesa napolitana",c:"Principales",p:15600,d:"Con papas fritas o puré.",col:"#2f6b3a",ok:true},
+  {id:6,n:"Bife de chorizo",c:"Principales",p:19800,d:"400 g, con ensalada mixta.",col:"#2f6b3a",ok:false},
+  {id:7,n:"Flan casero",c:"Postres",p:5200,d:"Con dulce de leche y crema.",col:"#7a4b8c",ok:true},
+  {id:8,n:"Tiramisú",c:"Postres",p:6400,d:"Receta de la nonna.",col:"#7a4b8c",ok:true},
+];
+const estados=["PENDIENTE","EN_PREPARACION","LISTO","ENTREGADO"];
+let pedidos=[
+  {id:101,cli:"Lucía M.",items:[[1,1],[7,2]],est:"EN_PREPARACION"},
+  {id:102,cli:"Martín R.",items:[[5,2]],est:"PENDIENTE"},
+];
+let cart={}, cat="Todos", nextId=103;
+const $=s=>document.querySelector(s), M=v=>Kit.money(v);
+const byId=id=>platos.find(p=>p.id===id);
+const totalOf=items=>items.reduce((s,[id,q])=>s+byId(id).p*q,0);
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),1800)}
+
+function renderCats(){
+  const cs=["Todos",...new Set(platos.map(p=>p.c))];
+  $("#cats").innerHTML=cs.map(c=>`<button aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join("");
+}
+function renderMenu(){
+  $("#menu").innerHTML=platos.filter(p=>cat==="Todos"||p.c===cat).map(p=>`
+    <article class="dish ${p.ok?"":"off"}">
+      <div class="ic" style="background:${p.col}">${p.n[0]}</div>
+      <h3>${p.n}</h3><p>${p.d}</p>
+      <div class="row"><span class="price">${M(p.p)}</span>
+      <button class="add" data-add="${p.id}" ${p.ok?"":"disabled"}>${p.ok?"Agregar":"Sin stock"}</button></div>
+    </article>`).join("");
+}
+function renderCart(){
+  const ids=Object.keys(cart).map(Number);
+  $("#cart").innerHTML=ids.length?ids.map(id=>`<div class="line"><span>${byId(id).n}</span>
+    <span class="qty"><button data-q="${id}" data-d="-1" aria-label="Quitar uno">−</button>${cart[id]}<button data-q="${id}" data-d="1" aria-label="Agregar uno">+</button></span>
+    <span>${M(byId(id).p*cart[id])}</span></div>`).join(""):'<p class="empty">Agregá platos del menú para armar tu pedido.</p>';
+  $("#tot").textContent=M(totalOf(ids.map(id=>[id,cart[id]])));
+  $("#confirm").disabled=!ids.length;
+}
+function itemsTxt(items){return items.map(([id,q])=>`${q}× ${byId(id).n}`).join(", ")}
+function renderMine(){
+  const mine=pedidos.filter(p=>p.cli==="Vos");
+  $("#mine").innerHTML=mine.length?`<table><thead><tr><th>#</th><th>Items</th><th>Total</th><th>Estado</th></tr></thead><tbody>${
+    mine.map(p=>`<tr><td>${p.id}</td><td>${itemsTxt(p.items)}</td><td>${M(totalOf(p.items))}</td><td><span class="pill ${p.est}">${p.est.replace("_"," ")}</span></td></tr>`).join("")}</tbody></table>`
+    :'<p class="empty">Todavía no hiciste pedidos. Cuando confirmes uno, cambiá a "Administrador" para avanzar su estado y volvé para verlo actualizado.</p>';
+}
+function renderAdmin(){
+  $("#all").innerHTML=pedidos.map(p=>`<tr><td>${p.id}</td><td>${p.cli}</td><td>${itemsTxt(p.items)}</td><td>${M(totalOf(p.items))}</td>
+    <td><span class="pill ${p.est}">${p.est.replace("_"," ")}</span></td>
+    <td><select data-est="${p.id}" aria-label="Estado del pedido ${p.id}">${estados.map(e=>`<option ${e===p.est?"selected":""}>${e}</option>`).join("")}</select></td></tr>`).join("");
+  $("#dishes").innerHTML=platos.map(p=>`<tr><td>${p.n}</td><td>${p.c}</td><td>${M(p.p)}</td>
+    <td><button class="sw" data-sw="${p.id}" aria-pressed="${p.ok}">${p.ok?"Disponible":"No disponible"}</button></td></tr>`).join("");
+}
+function all(){renderCats();renderMenu();renderCart();renderMine();renderAdmin()}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.c){cat=t.dataset.c;renderCats();renderMenu();Kit.log("GET","/api/platos/disponibles",200)}
+  if(t.dataset.add){const id=+t.dataset.add;cart[id]=(cart[id]||0)+1;renderCart();toast(byId(id).n+" agregado")}
+  if(t.dataset.q){const id=+t.dataset.q;cart[id]+=+t.dataset.d;if(cart[id]<=0)delete cart[id];renderCart()}
+  if(t.dataset.sw){const p=byId(+t.dataset.sw);p.ok=!p.ok;Kit.log("PUT","/api/platos/"+p.id,200);all()}
+  if(t.id==="r-cli"||t.id==="r-adm"){
+    const adm=t.id==="r-adm";$("#r-cli").setAttribute("aria-pressed",!adm);$("#r-adm").setAttribute("aria-pressed",adm);
+    $("#v-cli").hidden=adm;$("#v-adm").hidden=!adm;
+    Kit.log("POST","/api/usuarios/login  {rol:"+(adm?"ADMIN":"CLIENTE")+"}",200);
+    Kit.log("GET",adm?"/api/pedidos":"/api/pedidos/usuario/7",200);
+  }
+});
+$("#confirm").addEventListener("click",()=>{
+  const items=Object.keys(cart).map(id=>[+id,cart[id]]);
+  pedidos.unshift({id:nextId++,cli:"Vos",items,est:"PENDIENTE"});cart={};
+  Kit.log("POST","/api/pedidos",201);Kit.open();toast("Pedido #"+(nextId-1)+" confirmado");all();
+});
+document.addEventListener("change",e=>{
+  if(e.target.dataset.est){const p=pedidos.find(x=>x.id==e.target.dataset.est);p.est=e.target.value;
+    Kit.log("PATCH","/api/pedidos/"+p.id+"/estado",200);toast("Pedido #"+p.id+" → "+p.est.replace("_"," "));all()}
+});
+cart={1:1,7:1};
+all();Kit.log("GET","/api/platos/disponibles",200);
+</script>
+</body>
+</html>

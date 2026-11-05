@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Turnos Peluquería · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#f2f0ec; --card:#fff; --ink:#1b1b1d; --muted:#6f6c66; --line:#e2ded6;
+  --a:#2d5bff; --b:#e0457b; --c:#18a383; --warn:#d9480f; --display:"Syne",system-ui,sans-serif; --body:"DM Sans",system-ui,sans-serif;
+  /* layout: agenda diaria en columnas por peluquero + formulario lateral */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 110px;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+header.h{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:12px}
+h1{font:700 34px/1 var(--display);margin:0;letter-spacing:-.5px}
+h1 span{color:var(--muted);font-weight:600}
+.days{display:flex;gap:6px}
+.days button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font:600 13px var(--body);cursor:pointer;color:var(--ink);text-align:center;min-width:64px}
+.days button small{display:block;font-weight:500;color:var(--muted)}
+.days button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.days button[aria-pressed="true"] small{color:#bbb}
+.agenda{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow-x:auto}
+.ag{display:grid;grid-template-columns:58px repeat(3,minmax(170px,1fr));min-width:600px;position:relative}
+.colh{padding:12px;border-bottom:1px solid var(--line);font:600 14px var(--body);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--card)}
+.colh i{width:10px;height:10px;border-radius:50%}
+.time{font:500 12px "IBM Plex Mono",monospace;color:var(--muted);padding:2px 8px;height:36px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.slot{height:36px;border-top:1px solid var(--line);border-left:1px solid var(--line);cursor:pointer;position:relative}
+.slot:hover{background:#f6f5f2}
+.slot:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.ev{position:absolute;left:4px;right:4px;border-radius:9px;padding:6px 9px;font-size:12.5px;line-height:1.25;color:#fff;cursor:pointer;overflow:hidden;z-index:2;border:0;text-align:left;font-family:var(--body)}
+.ev b{display:block;font-size:13px}
+.ev.CANCELADO{opacity:.35;text-decoration:line-through}
+.ev.PENDIENTE{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 6px,transparent 6px 12px)}
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:96px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card h2{font:700 18px var(--display);margin:0 0 12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+label{font-size:12.5px;color:var(--muted);font-weight:500}
+select,input{padding:9px 10px;border:1px solid var(--line);border-radius:10px;font:500 14px var(--body);background:#fff;color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;border:0;border-radius:10px;padding:11px;background:var(--ink);color:#fff;font:600 14px var(--body);cursor:pointer}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.msg{font-size:13px;margin-top:10px;padding:8px 10px;border-radius:8px}
+.msg.e{background:#fde8e0;color:var(--warn)}.msg.o{background:#dff5ee;color:#0f7a60}
+.msg:empty{display:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats b{display:block;font:700 22px var(--display)}
+.stats span{font-size:12px;color:var(--muted)}
+.dlg{position:fixed;inset:0;background:rgba(20,20,22,.45);display:grid;place-items:center;z-index:960;padding:16px}
+.dlg .card{width:min(360px,100%)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+[hidden]{display:none!important}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}.side{position:static}}
+</style>
+</head>
+<body data-title="Turnos Peluquería" data-sub="Agenda online con validación de solapamiento" data-stack="Java 21,Spring Boot 4,JPA,MySQL 8.4,Docker,React" data-repo="https://github.com/Federicoegas001/turnos-peluqueria">
+<div class="wrap">
+  <header class="h">
+    <h1>Estudio Tijera <span>· Agenda</span></h1>
+    <div class="days" id="days" role="group" aria-label="Día"></div>
+  </header>
+  <div class="agenda"><div class="ag" id="ag"></div></div>
+  <aside class="side">
+    <form class="card" id="f">
+      <h2>Nuevo turno</h2>
+      <div class="field"><label for="f-cli">Cliente</label><input id="f-cli" value="Valentina López" required></div>
+      <div class="field"><label for="f-pel">Peluquero</label><select id="f-pel"></select></div>
+      <div class="field"><label for="f-srv">Servicio</label><select id="f-srv"></select></div>
+      <div class="row2">
+        <div class="field"><label for="f-dia">Día</label><select id="f-dia"></select></div>
+        <div class="field"><label for="f-hora">Hora</label><select id="f-hora"></select></div>
+      </div>
+      <button class="btn" type="submit">Reservar turno</button>
+      <div class="msg" id="msg" role="status"></div>
+      <p style="font-size:12.5px;color:var(--muted);margin:10px 0 0">Tip: hacé clic en un hueco de la agenda para completar peluquero y hora. Probá reservar encima de otro turno para ver la validación.</p>
+    </form>
+    <div class="card"><h2>Hoy</h2><div class="stats" id="stats"></div></div>
+  </aside>
+</div>
+<div class="dlg" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="d-t">
+  <div class="card"><h2 id="d-t"></h2><p id="d-b" style="margin:0 0 10px;color:var(--muted);font-size:14px"></p>
+    <div class="btns"><button class="btn" data-s="CONFIRMADO">Confirmar</button><button class="btn sec" data-s="COMPLETADO">Completado</button><button class="btn sec" data-s="CANCELADO">Cancelar turno</button><button class="btn sec" id="d-x">Cerrar</button></div></div>
+</div>
+<script src="../assets/kit.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const pel=[{id:1,n:"Nico",c:"var(--a)"},{id:2,n:"Flor",c:"var(--b)"},{id:3,n:"Tomás",c:"var(--c)"}];
+const srv=[{id:1,n:"Corte",min:30,p:9000},{id:2,n:"Corte + barba",min:60,p:13500},{id:3,n:"Color completo",min:90,p:28000},{id:4,n:"Brushing",min:30,p:7000},{id:5,n:"Mechas",min:120,p:36000}];
+const START=9*60,END=19*60,STEP=30;
+const base=new Date();base.setHours(0,0,0,0);
+const dias=[0,1,2,3].map(i=>{const d=new Date(base);d.setDate(d.getDate()+i);return d});
+const key=d=>d.toISOString().slice(0,10);
+let day=0,nid=10;
+const hm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+let turnos=[
+ {id:1,cli:"Juan P.",pel:1,srv:2,dia:0,ini:600,est:"CONFIRMADO"},{id:2,cli:"Ana G.",pel:2,srv:3,dia:0,ini:570,est:"CONFIRMADO"},
+ {id:3,cli:"Bruno S.",pel:1,srv:1,dia:0,ini:720,est:"PENDIENTE"},{id:4,cli:"Carla D.",pel:3,srv:5,dia:0,ini:840,est:"CONFIRMADO"},
+ {id:5,cli:"Diego F.",pel:2,srv:4,dia:0,ini:690,est:"PENDIENTE"},{id:6,cli:"Euge R.",pel:1,srv:1,dia:1,ini:630,est:"CONFIRMADO"},
+ {id:7,cli:"Fede M.",pel:3,srv:2,dia:1,ini:900,est:"PENDIENTE"}];
+const S=id=>srv.find(s=>s.id===id),P=id=>pel.find(p=>p.id===id);
+function renderDays(){$("#days").innerHTML=dias.map((d,i)=>`<button aria-pressed="${i===day}" data-day="${i}">${i===0?"Hoy":d.toLocaleDateString("es-AR",{weekday:"short"})}<small>${d.getDate()}/${d.getMonth()+1}</small></button>`).join("");
+  $("#f-dia").innerHTML=dias.map((d,i)=>`<option value="${i}" ${i===day?"selected":""}>${d.toLocaleDateString("es-AR",{weekday:"short",day:"numeric"})}</option>`).join("")}
+function renderAg(){
+  let h='<div class="colh"></div>'+pel.map(p=>`<div class="colh"><i style="background:${p.c}"></i>${p.n}</div>`).join("");
+  for(let m=START;m<END;m+=STEP){h+=`<div class="time">${m%60===0?hm(m):""}</div>`+pel.map(p=>`<div class="slot" tabindex="0" role="button" aria-label="${p.n} ${hm(m)}" data-pel="${p.id}" data-m="${m}"></div>`).join("")}
+  $("#ag").innerHTML=h;
+  turnos.filter(t=>t.dia===day).forEach(t=>{
+    const cell=$(`.slot[data-pel="${t.pel}"][data-m="${t.ini}"]`);if(!cell)return;
+    const b=document.createElement("button");b.className="ev "+t.est;b.dataset.t=t.id;
+    b.style.background=P(t.pel).c;b.style.top="2px";b.style.height=(S(t.srv).min/STEP*36-4)+"px";
+    b.innerHTML=`<b>${t.cli}</b>${S(t.srv).n} · ${hm(t.ini)}–${hm(t.ini+S(t.srv).min)}`;cell.appendChild(b)});
+  const hoy=turnos.filter(t=>t.dia===0&&t.est!=="CANCELADO");
+  $("#stats").innerHTML=`<div><b>${hoy.length}</b><span>turnos</span></div><div><b>${hoy.filter(t=>t.est==="PENDIENTE").length}</b><span>a confirmar</span></div><div><b>${Kit.money(hoy.reduce((s,t)=>s+S(t.srv).p,0)).replace(/\s/g," ")}</b><span>facturación</span></div>`;
+}
+function fill(){$("#f-pel").innerHTML=pel.map(p=>`<option value="${p.id}">${p.n}</option>`).join("");
+  $("#f-srv").innerHTML=srv.map(s=>`<option value="${s.id}">${s.n} (${s.min} min)</option>`).join("");
+  let o="";for(let m=START;m<END;m+=STEP)o+=`<option value="${m}">${hm(m)}</option>`;$("#f-hora").innerHTML=o;$("#f-hora").value=660}
+function overlap(n){return turnos.find(t=>t.est!=="CANCELADO"&&t.pel===n.pel&&t.dia===n.dia&&n.ini<t.ini+S(t.srv).min&&t.ini<n.ini+S(n.srv).min)}
+function msg(t,ok){const e=$("#msg");e.textContent=t;e.className="msg "+(ok?"o":"e")}
+$("#f").addEventListener("submit",e=>{e.preventDefault();
+  const n={id:nid++,cli:$("#f-cli").value.trim()||"Cliente",pel:+$("#f-pel").value,srv:+$("#f-srv").value,dia:+$("#f-dia").value,ini:+$("#f-hora").value,est:"PENDIENTE"};
+  if(n.ini+S(n.srv).min>END){Kit.log("POST","/api/turnos",400);return msg("El servicio termina después del cierre (19:00). Elegí un horario más temprano.")}
+  const c=overlap(n);
+  if(c){Kit.log("POST","/api/turnos",409);Kit.open();return msg(`409 Conflict: ${P(n.pel).n} ya tiene a ${c.cli} de ${hm(c.ini)} a ${hm(c.ini+S(c.srv).min)}.`)}
+  turnos.push(n);Kit.log("POST","/api/turnos",201);day=n.dia;renderDays();renderAg();msg(`Turno reservado: ${n.cli} con ${P(n.pel).n}, ${hm(n.ini)}.`,true)});
+let cur=null;
+document.addEventListener("click",e=>{
+  const ev=e.target.closest(".ev");
+  if(ev){e.stopPropagation();cur=turnos.find(t=>t.id==ev.dataset.t);$("#d-t").textContent=cur.cli+" · "+S(cur.srv).n;
+    $("#d-b").textContent=`${P(cur.pel).n}, ${hm(cur.ini)} a ${hm(cur.ini+S(cur.srv).min)} · Estado: ${cur.est}`;$("#dlg").hidden=false;Kit.log("GET","/api/turnos/"+cur.id,200);return}
+  const sl=e.target.closest(".slot");if(sl){$("#f-pel").value=sl.dataset.pel;$("#f-hora").value=sl.dataset.m;$("#f-dia").value=day;$("#f-cli").focus();return}
+  const d=e.target.closest("[data-day]");if(d){day=+d.dataset.day;renderDays();renderAg();Kit.log("GET","/api/turnos?fecha="+key(dias[day]),200);return}
+  const s=e.target.closest("[data-s]");if(s&&cur){cur.est=s.dataset.s;Kit.log("PATCH","/api/turnos/"+cur.id+"/estado",200);$("#dlg").hidden=true;renderAg()}
+  if(e.target.id==="d-x"||e.target.id==="dlg")$("#dlg").hidden=true;
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#dlg").hidden=true;if((e.key==="Enter")&&e.target.classList.contains("slot"))e.target.click()});
+fill();renderDays();renderAg();Kit.log("GET","/api/turnos?fecha="+key(dias[0]),200);
+</script>
+</body>
+</html>

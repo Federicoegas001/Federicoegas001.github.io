@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forja · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#0b0b0c; --panel:#151517; --panel2:#1e1e21; --ink:#f4f1ec; --muted:#8f8a84; --line:#2a2a2e;
+  --fire:#ff6a1a; --fire2:#ffb36b; --ok:#4ade80; --display:"Barlow Condensed",Impact,sans-serif; --body:"Barlow",system-ui,sans-serif;
+  /* layout: app del atleta (columna mobile) + panel del entrenador sincronizado */
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 var(--body)}
+.wrap{max-width:1140px;margin:0 auto;padding:22px 16px 110px;display:grid;grid-template-columns:420px 1fr;gap:28px;align-items:start}
+.lbl{font:700 12px var(--body);letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.app{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden}
+.ahead{padding:18px 18px 14px;background:linear-gradient(160deg,#2a1206,#151517 70%);border-bottom:1px solid var(--line)}
+.ahead h1{font:800 34px/1 var(--display);margin:4px 0 10px;text-transform:uppercase;letter-spacing:.5px}
+.clock{display:flex;gap:18px;align-items:end}
+.clock b{font:700 40px/1 var(--display);font-variant-numeric:tabular-nums;color:var(--fire)}
+.clock span{color:var(--muted);font-size:13px}
+.rest{margin:12px 18px 0;padding:10px 14px;border-radius:14px;background:rgba(255,106,26,.12);border:1px solid rgba(255,106,26,.4);display:flex;align-items:center;gap:12px}
+.rest b{font:700 28px var(--display);color:var(--fire2);font-variant-numeric:tabular-nums}
+.rest span{flex:1;font-size:13px;color:var(--fire2)}
+.rest button{border:0;background:var(--fire);color:#160800;border-radius:10px;padding:6px 10px;font:700 13px var(--body);cursor:pointer}
+.ex{padding:16px 18px;border-bottom:1px solid var(--line)}
+.ex h2{font:700 22px var(--display);margin:0;text-transform:uppercase;letter-spacing:.3px}
+.ex .meta{color:var(--muted);font-size:13px;margin:2px 0 10px}
+.sets{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center}
+.sets .h{font:600 11px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sets .n{font:700 18px var(--display);color:var(--muted);text-align:center}
+.sets input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px;font:600 16px var(--body);text-align:center;font-variant-numeric:tabular-nums}
+.sets input:focus{outline:2px solid var(--fire);border-color:transparent}
+.chk{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer;font-size:18px}
+.chk[aria-pressed="true"]{background:var(--fire);border-color:var(--fire);color:#160800}
+.done-row input{border-color:rgba(255,106,26,.35)}
+.finish{display:block;width:calc(100% - 36px);margin:16px 18px 18px;border:0;border-radius:14px;padding:14px;background:var(--fire);color:#160800;font:800 20px var(--display);text-transform:uppercase;letter-spacing:1px;cursor:pointer}
+.coach h2{font:800 30px/1 var(--display);text-transform:uppercase;margin:6px 0 16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.tile b{display:block;font:700 30px var(--display);font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:16px}
+.card h3{margin:0 0 10px;font:700 20px var(--display);text-transform:uppercase}
+.al{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.al:last-child{border:0}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 16px var(--display);background:var(--panel2)}
+.live{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--body);color:var(--ok)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pl 1.4s infinite}
+@keyframes pl{50%{opacity:.3}}
+.prog{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.prog:last-child{border:0}
+.tag{font:700 12px var(--body);padding:4px 10px;border-radius:99px}
+.tag.up{background:rgba(74,222,128,.15);color:var(--ok)}
+.tag.keep{background:var(--panel2);color:var(--muted)}
+.rule{font-size:13px;color:var(--muted);margin:10px 0 0}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:960;padding:16px}
+.dlg .card{width:min(440px,100%);margin:0}
+[hidden]{display:none!important}
+button:focus-visible{outline:2px solid var(--fire2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.live i{animation:none}}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body data-title="Forja" data-sub="App de entrenamiento · atleta y entrenador" data-stack="Kotlin,Android,React,Spring Boot,MySQL" data-repo="" data-note="proyecto personal en desarrollo (repo privado). La sesión del atleta se refleja en vivo en el panel del entrenador.">
+<div class="wrap">
+  <section class="app" aria-label="App del atleta">
+    <div class="ahead"><div class="lbl">Día de empuje · Semana 6</div><h1>Entrenamiento activo</h1>
+      <div class="clock"><div><b id="clk">00:00</b><br><span>tiempo total</span></div><div><b id="vol" style="color:var(--ink)">0</b><br><span>kg de volumen</span></div></div></div>
+    <div class="rest" id="rest" hidden><b id="restT">00:00</b><span id="restL">Descanso</span><button id="skip">Saltar</button></div>
+    <div id="exs"></div>
+    <button class="finish" id="fin">Terminar entrenamiento</button>
+  </section>
+  <section class="coach" aria-label="Panel del entrenador">
+    <div class="lbl">Vista entrenador · Coach Martina</div>
+    <h2>Tus alumnos</h2>
+    <div class="grid"><div class="tile"><b>12</b><span>alumnos activos</span></div><div class="tile"><b id="t-sets">0/9</b><span>series de Fede hoy</span></div><div class="tile"><b>87%</b><span>adherencia semanal</span></div></div>
+    <div class="card"><h3>Entrenando ahora</h3>
+      <div class="al"><div class="av" style="background:#3a1a08;color:var(--fire)">FE</div><div><b>Federico E.</b><br><small style="color:var(--muted)" id="t-now">Empuje · Press banca</small></div><span class="live"><i></i>en vivo</span></div>
+      <div class="al"><div class="av">LP</div><div><b>Lucía P.</b><br><small style="color:var(--muted)">Pierna · Sentadilla 4/5</small></div><span class="live"><i></i>en vivo</span></div>
+      <div class="al"><div class="av">MR</div><div><b>Marcos R.</b><br><small style="color:var(--muted)">Último entreno: ayer</small></div><span style="color:var(--muted);font-size:12px">offline</span></div>
+    </div>
+    <div class="card"><h3>Progresión sugerida · Federico</h3><div id="prog"></div>
+      <p class="rule">Regla: si todas las series llegan al techo del rango de repeticiones, la app sugiere +2,5 kg. Si no, se mantiene el peso.</p></div>
+  </section>
+</div>
+<div class="dlg" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dt"><div class="card"><h3 id="dt">Resumen</h3><div id="db"></div><button class="finish" style="width:100%;margin:14px 0 0" id="dx">Guardar y cerrar</button></div></div>
+<script src="../assets/kit.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const ex=[
+ {n:"Press banca",lo:8,hi:10,kg:60,rest:120,sets:[[60,10,true],[60,10,true],[60,"",false]]},
+ {n:"Press inclinado mancuernas",lo:8,hi:12,kg:22,rest:90,sets:[[22,"",false],[22,"",false],[22,"",false]]},
+ {n:"Press militar",lo:6,hi:8,kg:35,rest:120,sets:[[35,"",false],[35,"",false],[35,"",false]]},
+];
+let t0=Date.now()-14*60e3-12e3,restEnd=0,restLabel="";
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math.floor(s%60)).padStart(2,"0");
+function sugg(e){const done=e.sets.filter(s=>s[2]);if(done.length<e.sets.length)return{t:"keep",l:"En curso",w:e.kg};
+  const all=done.every(s=>+s[1]>=e.hi);return all?{t:"up",l:"Subir a "+(e.kg+2.5).toString().replace(".",",")+" kg",w:e.kg+2.5}:{t:"keep",l:"Mantener "+e.kg+" kg",w:e.kg}}
+function render(){
+  $("#exs").innerHTML=ex.map((e,i)=>`<div class="ex"><h2>${e.n}</h2><div class="meta">${e.sets.length} series · ${e.lo}–${e.hi} reps · descanso ${e.rest}s</div>
+   <div class="sets"><span class="h">Serie</span><span class="h">Kg</span><span class="h">Reps</span><span></span>
+   ${e.sets.map((s,j)=>`<span class="n">${j+1}</span><input class="${s[2]?"done-row":""}" inputmode="decimal" aria-label="Kg serie ${j+1} ${e.n}" data-i="${i}" data-j="${j}" data-k="0" value="${s[0]}"><input inputmode="numeric" placeholder="${e.hi}" aria-label="Reps serie ${j+1} ${e.n}" data-i="${i}" data-j="${j}" data-k="1" value="${s[1]}"><button class="chk" aria-pressed="${s[2]}" aria-label="Marcar serie ${j+1}" data-i="${i}" data-j="${j}">✓</button>`).join("")}</div></div>`).join("");
+  sync();
+}
+function sync(){
+  const all=ex.flatMap(e=>e.sets),d=all.filter(s=>s[2]);
+  $("#vol").textContent=d.reduce((a,s)=>a+(+s[0]||0)*(+s[1]||0),0).toLocaleString("es-AR");
+  $("#t-sets").textContent=d.length+"/"+all.length;
+  const cur=ex.find(e=>e.sets.some(s=>!s[2]));$("#t-now").textContent="Empuje · "+(cur?cur.n:"terminado");
+  $("#prog").innerHTML=ex.map(e=>{const s=sugg(e);return `<div class="prog"><span>${e.n}</span><span style="color:var(--muted);font-size:13px">${e.sets.filter(x=>x[2]).map(x=>x[1]||"–").join(" · ")||"sin series"}</span><span class="tag ${s.t}">${s.l}</span></div>`}).join("");
+}
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.k===undefined)return;ex[t.dataset.i].sets[t.dataset.j][+t.dataset.k]=t.value;sync()});
+document.addEventListener("click",e=>{const b=e.target.closest(".chk");if(!b)return;
+  const x=ex[b.dataset.i],s=x.sets[b.dataset.j];
+  if(!s[2]&&!s[1]){s[1]=String(x.hi)}
+  s[2]=!s[2];
+  if(s[2]){restEnd=Date.now()+x.rest*1000;restLabel="Descanso · próxima serie de "+x.n;Kit.log("POST","/api/sesiones/482/series",201)}else Kit.log("DELETE","/api/sesiones/482/series/"+b.dataset.j,204);
+  render();tick()});
+$("#skip").onclick=()=>{restEnd=0;tick()};
+$("#fin").onclick=()=>{Kit.log("PUT","/api/sesiones/482/finalizar",200);Kit.log("GET","/api/alumnos/7/progresion",200);
+  const dur=fmt((Date.now()-t0)/1000);
+  $("#db").innerHTML=`<p style="color:var(--muted);margin:0 0 8px">Duración ${dur} · ${$("#vol").textContent} kg de volumen</p>`+ex.map(e=>{const s=sugg(e);return `<div class="prog"><span>${e.n}</span><span></span><span class="tag ${s.t}">${s.t==="up"?s.l:(e.sets.every(x=>x[2])?s.l:"Incompleto · mantener")}</span></div>`}).join("");
+  $("#dlg").hidden=false};
+$("#dx").onclick=()=>{$("#dlg").hidden=true};
+function tick(){$("#clk").textContent=fmt((Date.now()-t0)/1000);
+  const r=(restEnd-Date.now())/1000;if(r>0){$("#rest").hidden=false;$("#restT").textContent=fmt(Math.ceil(r));$("#restL").textContent=restLabel}else $("#rest").hidden=true}
+setInterval(tick,500);
+restEnd=Date.now()+74e3;restLabel="Descanso · próxima serie de Press banca";
+render();tick();Kit.log("GET","/api/rutinas/empuje/sesion-activa",200);
+</script>
+</body>
+</html>

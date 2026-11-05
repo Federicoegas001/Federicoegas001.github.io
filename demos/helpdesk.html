@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HelpDesk · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#f3f3f7; --card:#fff; --ink:#1d1f2e; --muted:#666a80; --line:#e0e1ea; --php:#4f5b93; --php2:#e7e9f4;
+  --crit:#d8342c; --high:#e8730c; --med:#c59a00; --low:#3d8b5a; --font:"Public Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  /* layout: tablero kanban por estado con badges de SLA + panel lateral del ticket */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.45 var(--font)}
+.wrap{max-width:1280px;margin:0 auto;padding:22px 16px 110px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.top h1{margin:0;font:700 24px var(--font)}
+.top h1 span{color:var(--php)}
+.sp{flex:1}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;border-radius:8px;padding:7px 12px;font:600 13px var(--font);cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--php);color:#fff}
+.btn{border:0;border-radius:9px;padding:9px 14px;font:600 14px var(--font);cursor:pointer;background:var(--php);color:#fff}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--php);outline-offset:2px}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;display:flex;gap:8px;align-items:baseline}
+.kpi b{font:700 20px var(--font);font-variant-numeric:tabular-nums}
+.kpi span{color:var(--muted);font-size:13px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:#e9e9f0;border-radius:12px;padding:10px;min-height:300px}
+.col h2{font:700 13px var(--font);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:2px 4px 10px;display:flex;justify-content:space-between}
+.tk{all:unset;box-sizing:border-box;display:block;width:100%;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--p);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+.tk:hover{box-shadow:0 2px 10px rgba(30,30,60,.08)}
+.tk:focus-visible{outline:2px solid var(--php)}
+.tk .id{font:600 11.5px var(--mono);color:var(--muted)}
+.tk b{display:block;margin:2px 0 6px;font-weight:600;line-height:1.3}
+.tk .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.sla{font:600 11.5px var(--mono);padding:2px 7px;border-radius:6px;background:#eef6f0;color:var(--low)}
+.sla.warn{background:#fff3df;color:#a45a00}.sla.bad{background:#fde6e4;color:var(--crit)}.sla.done{background:#eeeef3;color:var(--muted)}
+.av{width:22px;height:22px;border-radius:50%;background:var(--php2);color:var(--php);display:inline-grid;place-items:center;font:700 10.5px var(--font)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--card);border-left:1px solid var(--line);box-shadow:-10px 0 40px rgba(20,20,40,.12);z-index:950;display:flex;flex-direction:column}
+.drawer header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:start}
+.drawer header h3{margin:0;font:700 18px var(--font);flex:1}
+.x{border:0;background:var(--php2);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px}
+.dbody{padding:16px 18px;overflow:auto;flex:1}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:13.5px;margin-bottom:14px}
+.kv span{color:var(--muted)}
+.cm{background:#f6f6fa;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13.5px}
+.cm small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
+.cm.int{background:#fff8e6}
+textarea,input,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 14px var(--font);background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.php{background:#1d1f2e;color:#d9dbef;border-radius:10px;padding:12px;font:12px/1.5 var(--mono);white-space:pre;overflow:auto;margin-top:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body data-title="HelpDesk" data-sub="Mesa de ayuda con SLA para soporte IT" data-stack="PHP 8.3,MVC propio,PDO,MySQL 8,Docker,PHPUnit" data-repo="https://github.com/Federicoegas001/helpdesk-php" data-note="basado en el día a día de un service desk. El SLA se calcula por prioridad y la consola muestra las consultas PDO del backend.">
+<div class="wrap">
+  <div class="top">
+    <h1>Help<span>Desk</span></h1>
+    <div class="seg" role="group" aria-label="Rol"><button id="r-t" aria-pressed="true">Técnico</button><button id="r-u" aria-pressed="false">Usuario</button></div>
+    <div class="sp"></div>
+    <button class="btn" id="new">+ Nuevo ticket</button>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="board" id="board"></div>
+</div>
+<aside class="drawer" id="drawer" hidden aria-label="Detalle del ticket"></aside>
+<script src="../assets/kit.js"></script>
+<script>
+const $=s=>document.querySelector(s),H=36e5;
+const P={Crítica:{h:4,c:"var(--crit)"},Alta:{h:8,c:"var(--high)"},Media:{h:24,c:"var(--med)"},Baja:{h:72,c:"var(--low)"}};
+const COLS=["Abierto","En curso","Esperando usuario","Resuelto"];
+const now=Date.now();
+let role="t",me="Federico E.",nid=1047;
+let T=[
+ {id:1041,t:"No puedo entrar a la VPN desde casa",cat:"Accesos",p:"Alta",st:"En curso",u:"Carla Méndez",a:"Federico E.",at:now-6.2*H,cm:[["Carla Méndez","Me dice 'credenciales inválidas' desde ayer.",0],["Federico E.","Reseteé tu MFA, probá de nuevo y avisame.",0]]},
+ {id:1042,t:"Impresora del 3er piso no imprime",cat:"Hardware",p:"Media",st:"Abierto",u:"Jorge Paz",a:null,at:now-3*H,cm:[["Jorge Paz","Queda en cola y no sale nada.",0]]},
+ {id:1043,t:"Caída del sistema de facturación",cat:"Software",p:"Crítica",st:"En curso",u:"Admin. Ventas",a:"Federico E.",at:now-3.4*H,cm:[["Admin. Ventas","Nadie puede facturar.",0],["Federico E.","Escalado a Infra, el servicio de base no responde.",1]]},
+ {id:1044,t:"Alta de usuario para nueva ingresante",cat:"Accesos",p:"Baja",st:"Esperando usuario",u:"RRHH",a:"Luz Ortega",at:now-20*H,cm:[["RRHH","Ingresa el lunes Martina Sosa.",0],["Luz Ortega","Necesito el legajo para crear la cuenta.",0]]},
+ {id:1045,t:"Outlook se cierra al abrir adjuntos",cat:"Software",p:"Media",st:"Abierto",u:"Pablo Ruiz",a:null,at:now-26*H,cm:[]},
+ {id:1046,t:"Cambio de mouse y teclado",cat:"Hardware",p:"Baja",st:"Resuelto",u:"Sofía Gil",a:"Federico E.",at:now-30*H,res:now-5*H,cm:[["Federico E.","Entregado en el puesto.",0]]},
+];
+const ini=n=>n.split(" ").map(x=>x[0]).join("").slice(0,2);
+function slaOf(t){const due=t.at+P[t.p].h*H;if(t.st==="Resuelto")return{cls:"done",txt:(t.res||now)<=due?"Cumplido":"Vencido"};
+  const l=due-Date.now(),hh=Math.floor(Math.abs(l)/H),mm=Math.floor(Math.abs(l)%H/6e4);const s=`${hh}h ${String(mm).padStart(2,"0")}m`;
+  return l<0?{cls:"bad",txt:"Vencido hace "+s}:l<P[t.p].h*H*.25?{cls:"warn",txt:"Quedan "+s}:{cls:"",txt:"Quedan "+s}}
+function visible(){return role==="t"?T:T.filter(t=>t.u===me)}
+function render(){
+  const v=visible(),open=v.filter(t=>t.st!=="Resuelto");
+  const brk=open.filter(t=>slaOf(t).cls==="bad").length;
+  $("#kpis").innerHTML=[[open.length,"abiertos"],[open.filter(t=>!t.a).length,"sin asignar"],[brk,"SLA vencido"],[v.filter(t=>t.st==="Resuelto").length,"resueltos hoy"]].map(([b,s])=>`<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join("");
+  $("#board").innerHTML=COLS.map(c=>{const l=v.filter(t=>t.st===c);return `<section class="col"><h2>${c}<span>${l.length}</span></h2>${l.map(t=>{const s=slaOf(t);return `<button class="tk" style="--p:${P[t.p].c}" data-t="${t.id}"><span class="id">#${t.id} · ${t.cat} · ${t.p}</span><b>${t.t}</b><span class="meta"><span class="sla ${s.cls}">${s.txt}</span>${t.a?`<span class="av" title="${t.a}">${ini(t.a)}</span>`:"<span>sin asignar</span>"}</span></button>`}).join("")||'<p style="color:var(--muted);font-size:13px;margin:4px">Sin tickets.</p>'}</section>`}).join("");
+}
+let open=null;
+function drawer(t){open=t;const s=slaOf(t);const d=$("#drawer");d.hidden=false;
+  d.innerHTML=`<header><div style="flex:1"><span class="id" style="font:600 12px var(--mono);color:var(--muted)">#${t.id}</span><h3>${Kit.esc(t.t)}</h3></div><button class="x" id="dx" aria-label="Cerrar">✕</button></header>
+  <div class="dbody"><div class="kv"><span>Estado</span><b>${t.st}</b><span>Prioridad</span><b style="color:${P[t.p].c}">${t.p} · SLA ${P[t.p].h} h</b><span>SLA</span><span class="sla ${s.cls}" style="justify-self:start">${s.txt}</span><span>Categoría</span><b>${t.cat}</b><span>Solicitante</span><b>${t.u}</b><span>Asignado</span><b>${t.a||"—"}</b></div>
+  ${t.cm.filter(c=>role==="t"||!c[2]).map(c=>`<div class="cm ${c[2]?"int":""}"><small>${c[0]}${c[2]?" · nota interna":""}</small>${Kit.esc(c[1])}</div>`).join("")||'<p style="color:var(--muted)">Sin comentarios todavía.</p>'}
+  <div class="field" style="margin-top:12px"><label for="cmt">Responder</label><textarea id="cmt" placeholder="Escribí una respuesta…"></textarea></div>
+  <div class="acts"><button class="btn" data-a="reply">Enviar</button>${role==="t"?`${t.a!==me?'<button class="btn sec" data-a="take">Tomar ticket</button>':""}${t.st!=="En curso"?'<button class="btn sec" data-a="En curso">Pasar a En curso</button>':""}${t.st!=="Esperando usuario"?'<button class="btn sec" data-a="Esperando usuario">Esperar usuario</button>':""}${t.st!=="Resuelto"?'<button class="btn sec" data-a="Resuelto">Resolver</button>':""}`:""}</div>
+  <div class="php">// TicketController::actualizarEstado()
+$stmt = $this->db->prepare(
+  'UPDATE tickets SET estado = :estado, tecnico_id = :tec
+   WHERE id = :id');
+$stmt->execute(['estado' => $estado,
+  'tec' => $tecnicoId, 'id' => $id]);</div></div>`;
+  Kit.log("GET","/tickets/"+t.id,200);Kit.log("SQL","SELECT … FROM comentarios WHERE ticket_id = ?","ok");}
+function newForm(){open=null;const d=$("#drawer");d.hidden=false;
+  d.innerHTML=`<header><h3>Nuevo ticket</h3><button class="x" id="dx" aria-label="Cerrar">✕</button></header><form class="dbody" id="nf">
+  <div class="field"><label for="n-t">Asunto</label><input id="n-t" value="La notebook no conecta al Wi-Fi corporativo" required></div>
+  <div class="field"><label for="n-c">Categoría</label><select id="n-c"><option>Red</option><option>Hardware</option><option>Software</option><option>Accesos</option></select></div>
+  <div class="field"><label for="n-p">Impacto</label><select id="n-p"><option value="Baja">Baja · puedo seguir trabajando</option><option value="Media" selected>Media · me afecta a mí</option><option value="Alta">Alta · afecta a mi equipo</option><option value="Crítica">Crítica · afecta a toda la empresa</option></select></div>
+  <div class="field"><label for="n-d">Descripción</label><textarea id="n-d">Desde esta mañana no aparece la red "CORP".</textarea></div>
+  <button class="btn" style="width:100%">Crear ticket</button></form>`;
+  $("#nf").onsubmit=e=>{e.preventDefault();const t={id:nid++,t:$("#n-t").value,cat:$("#n-c").value,p:$("#n-p").value,st:"Abierto",u:me,a:null,at:Date.now(),cm:[[me,$("#n-d").value,0]]};
+    T.push(t);Kit.log("POST","/tickets",201);Kit.log("SQL","INSERT INTO tickets (asunto, prioridad, vence_sla) VALUES (?, ?, NOW() + INTERVAL "+P[t.p].h+" HOUR)","ok");render();drawer(t)};}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.t)drawer(T.find(t=>t.id==b.dataset.t));
+  else if(b.id==="dx"){$("#drawer").hidden=true;open=null}
+  else if(b.id==="new")newForm();
+  else if(b.id==="r-t"||b.id==="r-u"){role=b.id==="r-t"?"t":"u";$("#r-t").setAttribute("aria-pressed",role==="t");$("#r-u").setAttribute("aria-pressed",role==="u");
+    if(role==="u"&&!T.some(t=>t.u===me))T.push({id:nid++,t:"Necesito acceso a la carpeta de Contabilidad",cat:"Accesos",p:"Baja",st:"Abierto",u:me,a:null,at:Date.now()-2*H,cm:[[me,"Para cerrar el mes.",0]]});
+    Kit.log("POST","/login  (rol: "+(role==="t"?"tecnico":"usuario")+")",302);$("#drawer").hidden=true;render()}
+  else if(b.dataset.a&&open){const a=b.dataset.a;
+    if(a==="reply"){const v=$("#cmt").value.trim();if(!v)return $("#cmt").focus();open.cm.push([role==="t"?"Federico E.":me,v,0]);Kit.log("POST","/tickets/"+open.id+"/comentarios",201)}
+    else if(a==="take"){open.a="Federico E.";if(open.st==="Abierto")open.st="En curso";Kit.log("PATCH","/tickets/"+open.id+"/asignar",200)}
+    else{open.st=a;if(a==="Resuelto")open.res=Date.now();if(!open.a)open.a="Federico E.";Kit.log("PATCH","/tickets/"+open.id+"/estado",200)}
+    render();drawer(open)}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#drawer").hidden=true});
+setInterval(render,30000);
+render();Kit.log("GET","/tickets?estado=abiertos",200);
+</script>
+</body>
+</html>

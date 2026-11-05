@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Federico Egas · Portfolio</title>
+<meta name="description" content="Federico Egas, programador backend. Java, Spring Boot, PHP, Python, MySQL y AWS. 9 proyectos con demo interactiva.">
+<meta property="og:title" content="Federico Egas · Programador backend">
+<meta property="og:description" content="Java, Spring Boot, PHP, Python, MySQL y AWS. 9 proyectos con demo interactiva.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23121316'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='16' text-anchor='middle' fill='%23e9481f'%3EFE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3f2ee; --card:#fbfaf7; --ink:#121316; --muted:#66676d; --line:#d9d7cf; --signal:#e9481f; --term:#121316; --termink:#e4e2dc;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  /* layout: hoja técnica. Hero con nombre ancho + respuesta JSON real; grilla de 9 proyectos con miniaturas vivas; columnas finas para el resto */
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#111214;--card:#17181b;--ink:#ecebe6;--muted:#9a9a9f;--line:#2b2c31;--signal:#ff6a3d;--term:#0b0b0d;--termink:#e4e2dc;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#111214;--card:#17181b;--ink:#ecebe6;--muted:#9a9a9f;--line:#2b2c31;--signal:#ff6a3d;--term:#0b0b0d;--termink:#e4e2dc;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--body)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+.w{max-width:1240px;margin:0 auto;padding:0 24px}
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .w{display:flex;align-items:center;gap:22px;height:56px}
+.mark{font:800 15px var(--display);font-stretch:125%;letter-spacing:.5px;text-decoration:none;text-transform:uppercase}
+.mark i{color:var(--signal);font-style:normal}
+.nav nav{display:flex;gap:18px;margin-left:auto;font:500 14px var(--mono)}
+.nav nav a{text-decoration:none;color:var(--muted)}
+.nav nav a:hover{color:var(--ink)}
+/* hero */
+.hero{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.hero .w{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:center}
+.eyebrow{font:500 13px var(--mono);color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:#2fbf71;box-shadow:0 0 0 4px rgba(47,191,113,.18)}
+h1{font:900 clamp(52px,8.2vw,118px)/.86 var(--display);font-stretch:125%;letter-spacing:-2px;text-transform:uppercase;margin:18px 0 22px;text-wrap:balance}
+h1 span{display:block;color:var(--signal)}
+.lead{font-size:19px;line-height:1.55;max-width:44ch;margin:0 0 26px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.b{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:8px;font:600 15px var(--body);text-decoration:none;border:1px solid var(--ink);cursor:pointer;background:transparent;color:var(--ink)}
+.b.p{background:var(--ink);color:var(--paper)}
+.b:hover{transform:translateY(-1px)}
+.term{background:var(--term);color:var(--termink);border-radius:14px;font:13px/1.6 var(--mono);overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.18)}
+.term header{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid #26272c}
+.term header i{width:10px;height:10px;border-radius:50%;background:#3a3b40}
+.term header span{margin-left:8px;color:#7c7d84;font-size:12px}
+.term pre{margin:0;padding:16px 18px;white-space:pre-wrap;word-break:break-word}
+.t-p{color:#7c7d84}.t-c{color:#fff}.t-k{color:#8fc7ff}.t-s{color:#bfe3a0}.t-n{color:#ffc66d}
+.cur{display:inline-block;width:8px;height:15px;background:var(--signal);vertical-align:-2px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cur{animation:none}}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.facts div{padding:20px 24px;border-right:1px solid var(--line)}
+.facts div:last-child{border-right:0}
+.facts b{display:block;font:800 34px/1 var(--display);font-stretch:110%;font-variant-numeric:tabular-nums}
+.facts span{font:500 13px var(--mono);color:var(--muted)}
+/* secciones */
+section.s{padding:64px 0;border-bottom:1px solid var(--line)}
+.sh{display:flex;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.sh h2{font:800 clamp(34px,4.6vw,56px)/.95 var(--display);font-stretch:118%;text-transform:uppercase;letter-spacing:-1px;margin:0;text-wrap:balance}
+.sh p{margin:0;color:var(--muted);max-width:52ch}
+.sh .sp{flex:1}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{font:500 13px var(--mono);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pj{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s,border-color .2s}
+.pj:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.10);border-color:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.pj[hidden]{display:none}
+.shot{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--s,#ddd);border-bottom:1px solid var(--line)}
+.shot iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none;background:#fff}
+.shot .ph{position:absolute;inset:0;display:grid;place-items:center;font:800 40px var(--display);font-stretch:125%;color:rgba(255,255,255,.6);text-transform:uppercase}
+.live{position:absolute;left:10px;top:10px;z-index:2;font:600 11px var(--mono);background:rgba(10,10,12,.78);color:#fff;padding:3px 8px;border-radius:6px;display:flex;gap:6px;align-items:center}
+.live i{width:6px;height:6px;border-radius:50%;background:#2fbf71}
+.pb{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;font:500 12px var(--mono);color:var(--muted)}
+.tag{padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.tag.new{border-color:var(--signal);color:var(--signal)}
+.pb h3{margin:0;font:800 24px/1.05 var(--display);font-stretch:112%;letter-spacing:-.3px}
+.pb h3 a{text-decoration:none}
+.pb h3 a::after{content:"";position:absolute;inset:0;z-index:1}
+.pb p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5;flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips span{font:500 11.5px var(--mono);padding:2px 7px;border-radius:5px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.acts{display:flex;gap:14px;align-items:center;font:600 13.5px var(--body)}
+.acts .go{color:var(--signal)}
+.acts a.code{position:relative;z-index:2;color:var(--muted);text-decoration:none}
+.acts a.code:hover{color:var(--ink);text-decoration:underline}
+.acts .priv{color:var(--muted);font-weight:500}
+.more{margin-top:22px;font:500 14px var(--mono);color:var(--muted)}
+.more a{color:var(--ink)}
+/* stack */
+.stack{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.stack div{padding:20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stack h3{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:0 0 12px}
+.stack ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.stack li{display:flex;justify-content:space-between;gap:8px;font-weight:500}
+.stack li small{font:500 12px var(--mono);color:var(--muted)}
+/* sobre mí */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.about p{max-width:60ch;margin:0 0 14px}
+.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.tl li{position:relative;padding:0 0 22px 22px}
+.tl li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+.tl li.on::before{background:var(--signal);border-color:var(--signal)}
+.tl b{display:block}
+.tl span{font:500 13px var(--mono);color:var(--muted)}
+.tl p{margin:4px 0 0;font-size:14.5px;color:var(--muted)}
+/* contacto */
+.contact{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
+.big{font:900 clamp(40px,6vw,84px)/.9 var(--display);font-stretch:125%;text-transform:uppercase;letter-spacing:-1.5px;margin:0}
+.links{display:flex;flex-direction:column;gap:10px}
+.lk{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:var(--card);text-decoration:none;font-weight:500}
+.lk small{font:500 13px var(--mono);color:var(--muted)}
+.lk button{font:600 13px var(--body);border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:7px;padding:6px 10px;cursor:pointer}
+footer{padding:28px 0 40px;font:500 13px var(--mono);color:var(--muted)}
+footer .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (max-width:1000px){.hero .w,.about,.contact{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.stack{grid-template-columns:1fr 1fr}.facts{grid-template-columns:1fr 1fr}.facts div:nth-child(2){border-right:0}.facts div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+@media (max-width:640px){.w{padding:0 16px}.grid{grid-template-columns:1fr}.nav nav{display:none}.stack{grid-template-columns:1fr}h1{letter-spacing:-1px}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="w">
+  <a class="mark" href="#inicio">Federico Egas<i>.</i></a>
+  <nav aria-label="Secciones"><a href="#proyectos">proyectos</a><a href="#stack">stack</a><a href="#sobre-mi">sobre mí</a><a href="#contacto">contacto</a></nav>
+</div></header>
+
+<main id="inicio">
+<section class="hero"><div class="w">
+  <div>
+    <div class="eyebrow"><span class="dot"></span>Disponible para un rol junior backend o cloud · Argentina · remoto</div>
+    <h1>Federico<span>Egas</span></h1>
+    <p class="lead">Programador backend. Construyo APIs y sistemas de gestión con Java y Spring Boot, y también trabajo con PHP, Python, MySQL y AWS. Vengo de soporte IT, así que diseño pensando en el usuario que llama cuando algo falla.</p>
+    <div class="ctas">
+      <a class="b p" href="#proyectos">Ver los 9 proyectos ↓</a>
+      <a class="b" href="https://github.com/Federicoegas001" target="_blank" rel="noopener">GitHub ↗</a>
+      <a class="b" href="https://www.linkedin.com/in/federicoegasing/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="b" href="#contacto">Contacto</a>
+    </div>
+  </div>
+  <div class="term" aria-label="Perfil en formato JSON">
+    <header><i></i><i></i><i></i><span>zsh · ~/federico</span></header>
+<pre><span class="t-p">$</span> <span class="t-c">curl -s api.federicoegas.dev/perfil | jq</span>
+{
+  <span class="t-k">"rol"</span>: <span class="t-s">"Backend Developer"</span>,
+  <span class="t-k">"stack"</span>: [<span class="t-s">"Java"</span>, <span class="t-s">"Spring Boot"</span>, <span class="t-s">"PHP"</span>, <span class="t-s">"Python"</span>, <span class="t-s">"MySQL"</span>, <span class="t-s">"AWS"</span>],
+  <span class="t-k">"estudiando"</span>: <span class="t-s">"Analista de Sistemas"</span>,
+  <span class="t-k">"certificando"</span>: <span class="t-s">"AWS Solutions Architect"</span>,
+  <span class="t-k">"hoy"</span>: <span class="t-s">"IT Support · Service Desk"</span>,
+  <span class="t-k">"proyectos_con_demo"</span>: <span class="t-n">9</span>
+}
+<span class="t-p">$</span> <span class="cur"></span></pre>
+  </div>
+</div></section>
+
+<div class="facts w" style="padding:0"><div><b>9</b><span>proyectos con demo en vivo</span></div><div><b>5</b><span>lenguajes: Java, PHP, Python, Kotlin, JS</span></div><div><b>20+</b><span>repos públicos en GitHub</span></div><div><b>AWS</b><span>Solutions Architect en curso</span></div></div>
+
+<section class="s" id="proyectos"><div class="w">
+  <div class="sh"><h2>Proyectos</h2><p>Tocá cualquier tarjeta para abrir la demo. Corren en el navegador con datos de ejemplo y una consola que muestra las llamadas al backend.</p><div class="sp"></div>
+    <div class="filters" id="filters" role="group" aria-label="Filtrar por tecnología"></div></div>
+  <div class="grid" id="grid"></div>
+  <p class="more">Más en GitHub: TaskAPI (Spring Boot + JWT + Swagger), sistema de adopciones en Java Swing con DAO sobre MySQL y apps Flutter. <a href="https://github.com/Federicoegas001?tab=repositories" target="_blank" rel="noopener">Ver todos los repos ↗</a></p>
+</div></section>
+
+<section class="s" id="stack"><div class="w">
+  <div class="sh"><h2>Stack</h2><p>Lo que uso en los proyectos de arriba, agrupado por capa.</p></div>
+  <div class="stack">
+    <div><h3>Backend</h3><ul><li>Java 17 / 21<small>principal</small></li><li>Spring Boot · JPA · Security</li><li>PHP 8 · PDO</li><li>Python · FastAPI</li><li>APIs REST · JWT</li></ul></div>
+    <div><h3>Datos</h3><ul><li>MySQL 8</li><li>Modelado relacional · SQL</li><li>Hibernate</li><li>SQLite</li><li>DynamoDB</li></ul></div>
+    <div><h3>Cloud y DevOps</h3><ul><li>AWS Lambda · EC2 · RDS</li><li>DynamoDB · SES · API Gateway</li><li>Docker · Docker Compose</li><li>Git · GitHub Actions</li><li>Railway · Render · Aiven</li></ul></div>
+    <div><h3>Front y mobile</h3><ul><li>React · Vite</li><li>Tailwind CSS</li><li>HTML · CSS · JavaScript</li><li>Kotlin · Android Studio</li><li>Firebase Auth · Firestore</li></ul></div>
+  </div>
+</div></section>
+
+<section class="s" id="sobre-mi"><div class="w about">
+  <div>
+    <div class="sh" style="margin-bottom:18px"><h2>Sobre mí</h2></div>
+    <p>Trabajo en IT Support, en el service desk de una empresa multinacional. Todos los días veo de cerca qué pasa cuando un sistema falla, cuando un certificado vence sin aviso o cuando un ticket se pierde. Eso me empujó a programar las herramientas que me hubiera gustado tener.</p>
+    <p>Estudio Análisis de Sistemas y hago casi todos los trabajos de la carrera como aplicaciones full stack, varios en equipo con feature branches, PRs y tableros en Jira. Hoy estoy enfocado en backend con Spring Boot y en la ruta de AWS Solutions Architect.</p>
+    <p>Busco mi primer rol como developer backend o cloud, idealmente remoto.</p>
+  </div>
+  <ol class="tl">
+    <li class="on"><b>IT Support · Service Desk</b><span>Multinacional de tecnología · actual</span><p>Soporte a usuarios, gestión de tickets y SLA, accesos y hardware.</p></li>
+    <li class="on"><b>AWS Solutions Architect</b><span>AWS Skill Builder · en curso</span><p>Diseño de soluciones, infraestructura global, Cloud Quest: Cloud Practitioner.</p></li>
+    <li class="on"><b>Analista de Sistemas</b><span>Carrera universitaria · en curso</span><p>Trabajo final: SITH-MED, sistema de gestión hospitalaria en equipo.</p></li>
+    <li><b>Proyectos de la carrera</b><span>2024 – hoy</span><p>RestaurantApp, NovaBank, AppRecetas, API de Solicitudes y Reportes, Adopciones.</p></li>
+  </ol>
+</div></section>
+
+<section class="s" id="contacto" style="border-bottom:0"><div class="w contact">
+  <p class="big">Hablemos<span style="color:var(--signal)">.</span></p>
+  <div class="links">
+    <div class="lk"><span>Email<br><small>egasagustin@gmail.com</small></span><button id="copy">Copiar</button></div>
+    <a class="lk" href="https://www.linkedin.com/in/federicoegasing/" target="_blank" rel="noopener"><span>LinkedIn<br><small>linkedin.com/in/federicoegasing</small></span><span>↗</span></a>
+    <a class="lk" href="https://github.com/Federicoegas001" target="_blank" rel="noopener"><span>GitHub<br><small>github.com/Federicoegas001</small></span><span>↗</span></a>
+  </div>
+</div></section>
+</main>
+<footer><div class="w"><span>© 2026 Federico Egas</span><span>Hecho a mano, sin frameworks · HTML, CSS y JS</span></div></footer>
+
+<script>
+const P=[
+ {s:"venceya",n:"VenceYa",c:"#0b7a75",y:"Nuevo",d:"Gestor de vencimientos para IT y pymes: dominios, certificados SSL, licencias y contratos, con un job diario que avisa por mail antes de que algo venza.",st:["Java 17","Spring Boot","MySQL","AWS"],f:["Java","AWS"],repo:"https://github.com/Federicoegas001/venceya"},
+ {s:"helpdesk",n:"HelpDesk",c:"#4f5b93",y:"Nuevo",d:"Mesa de ayuda con tablero por estado, SLA calculado por prioridad, roles de técnico y usuario y notas internas. Sale de mi trabajo diario en service desk.",st:["PHP 8","MVC","PDO","MySQL"],f:["PHP"],repo:"https://github.com/Federicoegas001/helpdesk-php"},
+ {s:"dolar",n:"Dólar Tracker",c:"#16324f",y:"Nuevo",d:"Oficial, blue y MEP con histórico, brecha y conversor. Una Lambda en Python guarda las cotizaciones cada 30 minutos en DynamoDB.",st:["Python","Lambda","DynamoDB","AWS SAM"],f:["Python","AWS"],repo:"https://github.com/Federicoegas001/dolar-tracker"},
+ {s:"restaurant",n:"RestaurantApp",c:"#c8361d",y:"Grupal",d:"Pedidos online: el cliente arma el carrito y confirma, el administrador gestiona platos, stock y el estado de cada pedido.",st:["Spring Boot 3.5","Spring Security","MySQL","React"],f:["Java","React"],repo:"https://github.com/Federicoegas001/restaurant-app"},
+ {s:"turnos",n:"Turnos Peluquería",c:"#2d5bff",y:"Personal",d:"Agenda por peluquero con servicios de distinta duración. El backend rechaza con 409 cualquier turno que se solape.",st:["Java 21","Spring Boot 4","MySQL","Docker"],f:["Java","React"],repo:"https://github.com/Federicoegas001/turnos-peluqueria"},
+ {s:"novabank",n:"NovaBank",c:"#7c3aed",y:"Grupal",d:"Home banking: resumen de cuentas, compra de dólares con cupo, plazo fijo y transferencias, con un design system oscuro propio.",st:["React 18","Vite","Tailwind"],f:["React"],repo:"https://github.com/Federicoegas001/NovaBank"},
+ {s:"solicitudes",n:"API de Solicitudes",c:"#15946b",y:"Grupal",d:"API para una consultora: reclamos, modificaciones y upgrades con SLA según el plan del cliente y reportes para administración.",st:["Python","FastAPI","SQLite"],f:["Python"],repo:"https://github.com/Federicoegas001/Api-Gestion-de-solicitudes-y-reportes"},
+ {s:"forja",n:"Forja",c:"#ff6a1a",y:"En desarrollo",d:"App de entrenamiento con roles de atleta y entrenador. Registra cada serie y sugiere subir peso cuando completás el rango de repeticiones.",st:["Kotlin","React","Spring Boot"],f:["Android","React","Java"],repo:""},
+ {s:"recetas",n:"AppRecetas",c:"#3f8f4f",y:"Grupal",d:"App Android que cruza tu despensa con el recetario, te dice qué podés cocinar y corre varios timers a la vez.",st:["Kotlin","Firebase Auth","Firestore"],f:["Android"],repo:"https://github.com/Federicoegas001/parcial2-tn-acn4av--Santiago_Castillo---Federico-egas"},
+];
+const F=["Todos","Java","Python","PHP","AWS","React","Android"];
+let f="Todos";
+const grid=document.getElementById("grid");
+grid.innerHTML=P.map((p,i)=>`<article class="pj" data-f="${p.f.join(",")}">
+  <div class="shot" style="--s:${p.c}"><span class="ph">${p.n}</span><iframe src="demos/${p.s}.html#thumb" title="Vista previa de ${p.n}" tabindex="-1" aria-hidden="true" loading="${i<6?"eager":"lazy"}"></iframe><span class="live"><i></i>demo en vivo</span></div>
+  <div class="pb"><div class="meta"><span>${String(i+1).padStart(2,"0")} / 09</span><span class="tag ${p.y==="Nuevo"?"new":""}">${p.y}</span></div>
+  <h3><a href="demos/${p.s}.html">${p.n}</a></h3><p>${p.d}</p>
+  <div class="chips">${p.st.map(s=>`<span>${s}</span>`).join("")}</div>
+  <div class="acts"><span class="go">Abrir demo →</span>${p.repo?`<a class="code" href="${p.repo}" target="_blank" rel="noopener">Código ↗</a>`:'<span class="priv">Repo privado</span>'}</div></div></article>`).join("");
+const fil=document.getElementById("filters");
+function rf(){fil.innerHTML=F.map(x=>`<button aria-pressed="${x===f}" data-x="${x}">${x}</button>`).join("");
+  grid.querySelectorAll(".pj").forEach(el=>el.hidden=!(f==="Todos"||el.dataset.f.split(",").includes(f)))}
+fil.addEventListener("click",e=>{const b=e.target.closest("button");if(b){f=b.dataset.x;rf()}});rf();
+// escalar miniaturas al ancho de la tarjeta
+const ro=new ResizeObserver(es=>es.forEach(e=>{const ifr=e.target.querySelector("iframe");if(ifr)ifr.style.transform=`scale(${e.contentRect.width/1280})`}));
+document.querySelectorAll(".shot").forEach(s=>ro.observe(s));
+document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText("egasagustin@gmail.com");b.textContent="¡Copiado!"}catch{b.textContent="Copialo de arriba"}setTimeout(()=>b.textContent="Copiar",1800)});
+</script>
+</body>
+</html>

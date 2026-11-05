@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VenceYa · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#eef1f3; --card:#fff; --ink:#14202b; --muted:#5f6b76; --line:#dde2e7; --accent:#0b7a75;
+  --crit:#d63c2f; --warn:#e08a00; --ok:#2e8b57; --gone:#6b1f1a; --font:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  /* layout: resumen (tiles + timeline) arriba, tabla de vencimientos con franja de severidad, panel lateral de alta y notificaciones */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font)}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 110px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font:700 24px var(--font)}
+.brand i{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:#fff;font:700 15px var(--mono);font-style:normal}
+.org{color:var(--muted)}
+.sp{flex:1}
+.btn{border:0;border-radius:9px;padding:9px 14px;font:600 14px var(--font);cursor:pointer;background:var(--accent);color:#fff}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-top:4px solid var(--c,var(--line))}
+.tile b{display:block;font:700 32px/1.1 var(--font);font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:13.5px}
+.main{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h2{font:600 16px var(--font);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h2 small{font:500 12px var(--mono);color:var(--muted);margin-left:auto}
+.tl{display:grid;grid-template-columns:repeat(13,1fr);gap:6px;align-items:end;height:90px;margin-bottom:6px}
+.tl div{background:var(--accent);opacity:.85;border-radius:4px 4px 0 0;min-height:3px;position:relative}
+.tl div.hot{background:var(--crit)}
+.tl div span{position:absolute;top:-18px;left:0;right:0;text-align:center;font:600 11px var(--mono);color:var(--ink)}
+.tlx{display:grid;grid-template-columns:repeat(13,1fr);gap:6px;font:500 10.5px var(--mono);color:var(--muted);text-align:center}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.filters button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font:500 13px var(--font);cursor:pointer;color:var(--ink)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+th{font:600 11.5px var(--font);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;vertical-align:middle}
+tr td:first-child{border-left:4px solid var(--sev)}
+.name b{display:block;font-weight:600}
+.name small{color:var(--muted);font:500 12px var(--mono)}
+.type{font:600 11.5px var(--mono);padding:3px 8px;border-radius:6px;background:#eef3f3;color:var(--accent)}
+.days{font:700 15px var(--mono)}
+.pill{font:600 12px var(--font);padding:3px 9px;border-radius:99px;color:#fff;background:var(--sev)}
+.lnk{border:0;background:none;color:var(--accent);font:600 13px var(--font);cursor:pointer;padding:4px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+label{font-size:12.5px;color:var(--muted);font-weight:500}
+input,select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:500 14px var(--font);background:#fff;color:var(--ink)}
+.notif{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
+.notif li{padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;display:grid;grid-template-columns:10px 1fr;gap:10px}
+.notif li i{width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--sev)}
+.notif small{display:block;color:var(--muted);font:500 11.5px var(--mono)}
+.empty{color:var(--muted);font-size:13.5px}
+.side{display:flex;flex-direction:column;gap:16px}
+@media (max-width:980px){.main{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body data-title="VenceYa" data-sub="Gestor de vencimientos para IT y pymes" data-stack="Java 17,Spring Boot 3,Spring Scheduler,MySQL,Docker,AWS EC2 + RDS + SES" data-repo="https://github.com/Federicoegas001/venceya" data-note="el job diario (@Scheduled) revisa vencimientos y manda alertas por mail a 30, 15, 7 y 1 día. Acá podés dispararlo a mano.">
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><i>V</i>VenceYa</div><span class="org">· Estudio Contable Rivas</span><div class="sp"></div>
+    <button class="btn" id="job">Ejecutar job diario</button>
+  </div>
+  <div class="tiles" id="tiles"></div>
+  <div class="main">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card"><h2>Próximas 13 semanas <small>vencimientos por semana</small></h2><div class="tl" id="tl"></div><div class="tlx" id="tlx"></div></div>
+      <div class="card"><h2>Vencimientos</h2>
+        <div class="filters" id="filters"></div>
+        <div class="tw"><table><thead><tr><th>Recurso</th><th>Tipo</th><th>Vence</th><th>Faltan</th><th>Estado</th><th>Costo anual</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+      </div>
+    </div>
+    <aside class="side">
+      <form class="card" id="f"><h2>Agregar vencimiento</h2>
+        <div class="field"><label for="f-n">Nombre</label><input id="f-n" value="vpn.rivas.com.ar" required></div>
+        <div class="field"><label for="f-t">Tipo</label><select id="f-t"><option>Certificado SSL</option><option>Dominio</option><option>Licencia</option><option>Contrato</option></select></div>
+        <div class="field"><label for="f-d">Fecha de vencimiento</label><input id="f-d" type="date" required></div>
+        <div class="field"><label for="f-r">Responsable</label><input id="f-r" value="soporte@rivas.com.ar"></div>
+        <button class="btn" style="width:100%">Guardar</button>
+      </form>
+      <div class="card"><h2>Alertas enviadas <small id="nc"></small></h2><ul class="notif" id="notif"></ul></div>
+    </aside>
+  </div>
+</div>
+<script src="../assets/kit.js"></script>
+<script>
+const $=s=>document.querySelector(s),DAY=864e5;
+const today=new Date();today.setHours(0,0,0,0);
+const inD=n=>new Date(today.getTime()+n*DAY);
+let items=[
+ {id:1,n:"rivas.com.ar",t:"Dominio",d:inD(5),c:18000,r:"it@rivas.com.ar",p:"NIC Argentina"},
+ {id:2,n:"*.rivas.com.ar",t:"Certificado SSL",d:inD(-2),c:95000,r:"soporte@rivas.com.ar",p:"Sectigo"},
+ {id:3,n:"Microsoft 365 Business (14)",t:"Licencia",d:inD(12),c:1680000,r:"admin@rivas.com.ar",p:"Microsoft"},
+ {id:4,n:"Mantenimiento servidores",t:"Contrato",d:inD(27),c:2400000,r:"gerencia@rivas.com.ar",p:"TecnoSur SRL"},
+ {id:5,n:"Antivirus ESET (20 puestos)",t:"Licencia",d:inD(44),c:540000,r:"soporte@rivas.com.ar",p:"ESET"},
+ {id:6,n:"portal.rivas.com.ar",t:"Certificado SSL",d:inD(63),c:0,r:"soporte@rivas.com.ar",p:"Let's Encrypt"},
+ {id:7,n:"Tango Gestión",t:"Licencia",d:inD(81),c:1150000,r:"admin@rivas.com.ar",p:"Axoft"},
+ {id:8,n:"estudiorivas.com",t:"Dominio",d:inD(2),c:21000,r:"it@rivas.com.ar",p:"GoDaddy"},
+ {id:9,n:"Enlace de fibra 300 Mb",t:"Contrato",d:inD(150),c:3100000,r:"gerencia@rivas.com.ar",p:"Telecentro"},
+];
+let filter="Todos",nid=10,notifs=[];
+const left=i=>Math.round((i.d-today)/DAY);
+function sev(n){return n<0?["var(--gone)","Vencido"]:n<=7?["var(--crit)","Crítico"]:n<=30?["var(--warn)","Próximo"]:["var(--ok)","En regla"]}
+function render(){
+  const L=items.map(left);
+  const t=[["Vencidos",L.filter(n=>n<0).length,"var(--gone)"],["Vencen en 7 días",L.filter(n=>n>=0&&n<=7).length,"var(--crit)"],["Vencen en 30 días",L.filter(n=>n>7&&n<=30).length,"var(--warn)"],["Costo anual monitoreado",Kit.money(items.reduce((s,i)=>s+i.c,0)),"var(--accent)"]];
+  $("#tiles").innerHTML=t.map(([l,v,c])=>`<div class="tile" style="--c:${c}"><b>${v}</b><span>${l}</span></div>`).join("");
+  const wk=Array(13).fill(0);items.forEach(i=>{const n=left(i);if(n>=0&&n<91)wk[Math.floor(n/7)]++});const mx=Math.max(1,...wk);
+  $("#tl").innerHTML=wk.map((v,i)=>`<div class="${i===0&&v?"hot":""}" style="height:${v/mx*72+3}px">${v?`<span>${v}</span>`:""}</div>`).join("");
+  $("#tlx").innerHTML=wk.map((v,i)=>`<span>${i===0?"esta":"+"+i}</span>`).join("");
+  const types=["Todos","Dominio","Certificado SSL","Licencia","Contrato"];
+  $("#filters").innerHTML=types.map(x=>`<button aria-pressed="${x===filter}" data-f="${x}">${x}${x==="Todos"?"":" · "+items.filter(i=>i.t===x).length}</button>`).join("");
+  $("#rows").innerHTML=items.filter(i=>filter==="Todos"||i.t===filter).sort((a,b)=>a.d-b.d).map(i=>{const n=left(i),[c,l]=sev(n);
+    return `<tr style="--sev:${c}"><td class="name"><b>${i.n}</b><small>${i.p} · ${i.r}</small></td><td><span class="type">${i.t}</span></td><td>${i.d.toLocaleDateString("es-AR")}</td>
+    <td class="days" style="color:${c}">${n<0?"hace "+(-n)+" d":n+" d"}</td><td><span class="pill">${l}</span></td><td>${i.c?Kit.money(i.c):"Gratis"}</td><td><button class="lnk" data-renew="${i.id}">Renovar</button></td></tr>`}).join("");
+  $("#notif").innerHTML=notifs.length?notifs.map(x=>`<li style="--sev:${x.c}"><i></i><div>${x.t}<small>${x.to} · ${x.at}</small></div></li>`).join(""):'<li class="empty" style="display:block">Todavía no se envió ninguna alerta hoy. Tocá "Ejecutar job diario".</li>';
+  $("#nc").textContent=notifs.length?notifs.length+" hoy":"";
+}
+function runJob(){
+  Kit.log("CRON","AlertaVencimientoJob · @Scheduled(cron = \"0 0 8 * * *\")","start");
+  Kit.log("SQL","SELECT * FROM vencimiento WHERE fecha <= CURDATE() + INTERVAL 30 DAY","ok");
+  const umbrales=[30,15,7,1,0];let sent=0;const at=new Date().toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  items.forEach(i=>{const n=left(i);let txt=null;
+    if(n<0)txt=`${i.n} venció hace ${-n} día${n===-1?"":"s"}. Renovalo cuanto antes.`;
+    else if(n<=30){const u=umbrales.find(u=>n<=u&&n>(umbrales[umbrales.indexOf(u)+1]??-1));txt=`${i.n} vence en ${n} día${n===1?"":"s"} (aviso de ${u} días).`}
+    if(txt){notifs.unshift({t:txt,to:i.r,at,c:sev(n)[0]});Kit.log("MAIL","AWS SES → "+i.r,"202");sent++}});
+  Kit.log("CRON","AlertaVencimientoJob · "+sent+" alertas enviadas","done");Kit.open();render();
+}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.f){filter=b.dataset.f;render();Kit.log("GET","/api/vencimientos"+(filter==="Todos"?"":"?tipo="+encodeURIComponent(filter)),200)}
+  if(b.dataset.renew){const i=items.find(x=>x.id==b.dataset.renew);const base=i.d<today?today:i.d;i.d=new Date(base.getFullYear()+1,base.getMonth(),base.getDate());Kit.log("PATCH","/api/vencimientos/"+i.id+"/renovar",200);render()}
+});
+$("#job").onclick=runJob;
+$("#f-d").value=inD(9).toISOString().slice(0,10);
+$("#f").addEventListener("submit",e=>{e.preventDefault();const[y,m,d]=$("#f-d").value.split("-").map(Number);
+  items.push({id:nid++,n:$("#f-n").value,t:$("#f-t").value,d:new Date(y,m-1,d),c:0,r:$("#f-r").value,p:"Cargado a mano"});Kit.log("POST","/api/vencimientos",201);render()});
+render();Kit.log("GET","/api/vencimientos",200);Kit.log("GET","/api/vencimientos/resumen",200);
+</script>
+</body>
+</html>

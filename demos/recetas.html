@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AppRecetas · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#e8efe6; --phone:#111; --scr:#fbfaf6; --ink:#1f2a1f; --muted:#6c766a; --line:#e6e3da;
+  --green:#3f8f4f; --green2:#dcefdc; --amber:#f2a33a; --font:"Nunito",system-ui,sans-serif;
+  /* layout: teléfono Android al centro + notas técnicas a la derecha */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font)}
+.stage{max-width:1050px;margin:0 auto;padding:28px 16px 110px;display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center}
+.phone{width:360px;height:740px;background:var(--phone);border-radius:46px;padding:12px;box-shadow:0 30px 60px rgba(30,50,30,.25)}
+.scr{width:100%;height:100%;background:var(--scr);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.status{display:flex;justify-content:space-between;padding:12px 24px 6px;font:700 12px var(--font)}
+.appbar{padding:6px 20px 12px;display:flex;align-items:center;gap:10px}
+.appbar h2{margin:0;font:800 22px var(--font);flex:1}
+.back{border:0;background:var(--green2);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;color:var(--green)}
+.body{flex:1;overflow:auto;padding:0 16px 16px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:#fff}
+.tabs button{border:0;background:none;padding:10px 0 14px;font:700 12px var(--font);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs button span{font-size:19px}
+.tabs button[aria-current="page"]{color:var(--green)}
+.search{width:100%;padding:11px 14px;border-radius:14px;border:1px solid var(--line);font:600 14px var(--font);background:#fff;margin-bottom:12px}
+.rc{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;margin-bottom:10px;cursor:pointer;align-items:center;width:100%;text-align:left;font:inherit;color:inherit}
+.thumb{width:62px;height:62px;border-radius:14px;display:grid;place-items:center;font-size:30px;flex:none}
+.rc h3{margin:0 0 2px;font:800 15px var(--font)}
+.rc small{color:var(--muted);font-weight:600}
+.match{margin-top:6px;height:6px;background:#eee;border-radius:9px;overflow:hidden}
+.match i{display:block;height:100%;background:var(--green)}
+.chip{display:inline-block;font:800 11px var(--font);padding:2px 8px;border-radius:99px;background:var(--green2);color:var(--green);margin-top:4px}
+.chip.w{background:#fdebd0;color:#a35f00}
+.pantry{display:flex;flex-wrap:wrap;gap:8px}
+.pantry button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 12px;font:700 13px var(--font);cursor:pointer;color:var(--ink)}
+.pantry button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.sec{font:800 13px var(--font);text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:16px 0 8px}
+.ing{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-weight:600}
+.ing .ok{color:var(--green)}.ing .no{color:#c0392b}
+ol.steps{padding-left:20px;margin:0}
+ol.steps li{margin-bottom:8px}
+.big{border:0;width:100%;padding:13px;border-radius:14px;background:var(--green);color:#fff;font:800 15px var(--font);cursor:pointer;margin-top:12px}
+.big.alt{background:var(--amber);color:#2a1a00}
+.tm{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.tm .t{font:800 30px var(--font);font-variant-numeric:tabular-nums;flex:1}
+.tm.done{border-color:var(--amber);background:#fff6e6}
+.tm small{display:block;font:700 12px var(--font);color:var(--muted)}
+.rb{border:0;width:40px;height:40px;border-radius:50%;background:var(--green2);color:var(--green);cursor:pointer;font-weight:800}
+.login{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px}
+.login h1{font:800 32px/1.1 var(--font);margin:0 0 6px}
+.login p{color:var(--muted);margin:0 0 22px}
+.login input{width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);font:600 15px var(--font);margin-bottom:10px;background:#fff}
+.notes h1{font:800 34px/1.1 var(--font);margin:0 0 10px}
+.notes p{max-width:52ch;color:#3d4a3c}
+.notes ul{padding-left:18px;color:#3d4a3c}
+.notes li{margin-bottom:6px}
+.notes code{font:500 13px "IBM Plex Mono",monospace;background:#fff;padding:1px 6px;border-radius:6px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+@media (max-width:860px){.stage{grid-template-columns:1fr;justify-items:center}.phone{width:min(360px,100%)}}
+</style>
+</head>
+<body data-title="AppRecetas" data-sub="App Android de recetas" data-stack="Kotlin,Android Studio,Firebase Auth,Firestore,MVVM" data-repo="https://github.com/Federicoegas001/parcial2-tn-acn4av--Santiago_Castillo---Federico-egas" data-note="TP final de Aplicaciones Móviles hecho en pareja; acá se recrean las pantallas de la app nativa para verla sin instalar el APK.">
+<div class="stage">
+  <div class="phone"><div class="scr" id="scr"></div></div>
+  <div class="notes">
+    <h1>¿Qué cocino con lo que tengo?</h1>
+    <p>AppRecetas cruza tu despensa con el recetario y te muestra qué podés preparar ya, qué te falta y te deja correr varios temporizadores a la vez mientras cocinás.</p>
+    <ul>
+      <li>Login y registro con <b>Firebase Authentication</b> (email y contraseña).</li>
+      <li>Perfiles y despensa guardados en <b>Cloud Firestore</b>.</li>
+      <li>Arquitectura <b>MVVM</b>: <code>AuthViewModel</code>, <code>HomeViewModel</code>, repositorios y adapters de RecyclerView.</li>
+      <li>Cálculo de coincidencia receta ↔ despensa en el ViewModel.</li>
+    </ul>
+    <p>Probá: marcá ingredientes en <b>Despensa</b> y mirá cómo cambia el porcentaje en las recetas.</p>
+  </div>
+</div>
+<script src="../assets/kit.js"></script>
+<script>
+const R=[
+ {id:1,n:"Tortilla de papas",e:"🥔",bg:"#fde9c9",min:35,ing:["Papa","Huevo","Cebolla","Aceite","Sal"],steps:["Cortá las papas y la cebolla en láminas finas.","Freí a fuego bajo 20 minutos.","Batí los huevos, mezclá y cuajá 4 minutos por lado."],t:20},
+ {id:2,n:"Fideos con tuco",e:"🍝",bg:"#fbd5cf",min:40,ing:["Fideos","Tomate","Cebolla","Ajo","Aceite"],steps:["Rehogá cebolla y ajo.","Sumá el tomate y cociná 25 minutos.","Herví los fideos 9 minutos y mezclá."],t:9},
+ {id:3,n:"Panqueques",e:"🥞",bg:"#f7e7b8",min:20,ing:["Harina","Leche","Huevo","Manteca"],steps:["Mezclá todo hasta que no queden grumos.","Dejá reposar 10 minutos.","Cociná en sartén caliente."],t:10},
+ {id:4,n:"Ensalada César",e:"🥗",bg:"#d9efd2",min:15,ing:["Lechuga","Pollo","Queso","Pan","Huevo"],steps:["Grillá el pollo.","Tostá el pan en cubos.","Armá con la salsa y el queso."],t:12},
+ {id:5,n:"Arroz con pollo",e:"🍗",bg:"#fde2c2",min:45,ing:["Arroz","Pollo","Cebolla","Morrón","Aceite"],steps:["Dorá el pollo.","Sofreí cebolla y morrón.","Agregá el arroz y caldo, 18 minutos."],t:18},
+];
+const ALL=[...new Set(R.flatMap(r=>r.ing))].sort();
+let pantry=new Set(["Papa","Huevo","Cebolla","Aceite","Sal","Harina","Leche"]);
+let view="login",tab="recetas",cur=null,q="",timers=[{n:"Hervir agua",s:300,left:183,run:true}];
+const scr=document.getElementById("scr");
+const pct=r=>Math.round(r.ing.filter(i=>pantry.has(i)).length/r.ing.length*100);
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+const status='<div class="status"><span>9:41</span><span>● ▲ ▮</span></div>';
+function tabs(){return `<nav class="tabs">${[["recetas","📖","Recetas"],["despensa","🧺","Despensa"],["timers","⏱️","Timers"]].map(([k,i,l])=>`<button data-tab="${k}" ${tab===k?'aria-current="page"':""}><span>${i}</span>${l}</button>`).join("")}</nav>`}
+function render(){
+  if(view==="login"){scr.innerHTML=status+`<form class="login" id="lg"><div style="font-size:46px">🍳</div><h1>AppRecetas</h1><p>Cociná con lo que tenés en casa.</p>
+    <input aria-label="Email" value="sofi@mail.com"><input aria-label="Contraseña" type="password" value="12345678"><button class="big">Ingresar</button>
+    <p style="margin:14px 0 0;text-align:center;font-size:13px">¿No tenés cuenta? <b style="color:var(--green)">Registrate</b></p></form>`;
+    scr.querySelector("#lg").onsubmit=e=>{e.preventDefault();Kit.log("POST","firebase.auth · signInWithEmailAndPassword","OK");Kit.log("GET","firestore · users/{uid}","OK");view="app";render()};return}
+  if(cur){const r=cur;scr.innerHTML=status+`<div class="appbar"><button class="back" data-back aria-label="Volver">←</button><h2>${r.n}</h2></div><div class="body">
+    <div class="thumb" style="width:100%;height:120px;background:${r.bg};font-size:64px;border-radius:20px">${r.e}</div>
+    <div class="sec">Ingredientes · ${pct(r)}% en tu despensa</div>${r.ing.map(i=>`<div class="ing"><span>${i}</span>${pantry.has(i)?'<span class="ok">✓ Tenés</span>':'<span class="no">Te falta</span>'}</div>`).join("")}
+    <div class="sec">Pasos · ${r.min} min</div><ol class="steps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+    <button class="big alt" data-timer="${r.id}">Iniciar timer de ${r.t} min</button></div>`+tabs();return}
+  let b="";
+  if(tab==="recetas"){const list=R.filter(r=>r.n.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>pct(b)-pct(a));
+    b=`<input class="search" id="q" placeholder="Buscar receta" value="${q}" aria-label="Buscar receta">`+list.map(r=>{const p=pct(r),f=r.ing.length-r.ing.filter(i=>pantry.has(i)).length;return `<button class="rc" data-r="${r.id}"><div class="thumb" style="background:${r.bg}">${r.e}</div><div style="flex:1"><h3>${r.n}</h3><small>${r.min} min · ${r.ing.length} ingredientes</small><div class="match"><i style="width:${p}%"></i></div>${f===0?'<span class="chip">¡Podés hacerla!</span>':`<span class="chip w">Te falta${f>1?"n":""} ${f}</span>`}</div></button>`}).join("")}
+  if(tab==="despensa")b=`<p style="margin:0 0 12px;color:var(--muted);font-weight:600">Tocá lo que tenés en casa (${pantry.size}/${ALL.length})</p><div class="pantry">${ALL.map(i=>`<button data-p="${i}" aria-pressed="${pantry.has(i)}">${i}</button>`).join("")}</div>`;
+  if(tab==="timers")b=(timers.length?timers.map((t,i)=>`<div class="tm ${t.left===0?"done":""}"><div style="flex:1"><small>${t.n}</small><div class="t">${t.left===0?"¡Listo!":fmt(t.left)}</div></div><button class="rb" data-tp="${i}" aria-label="${t.run?"Pausar":"Reanudar"}">${t.run?"❚❚":"▶"}</button><button class="rb" data-tx="${i}" aria-label="Eliminar">✕</button></div>`).join(""):'<p style="color:var(--muted)">No hay timers corriendo. Abrí una receta e iniciá uno.</p>')+`<button class="big" data-add5>+ Timer de 5 min</button>`;
+  const title={recetas:"Recetas",despensa:"Mi despensa",timers:"Timers"}[tab];
+  scr.innerHTML=status+`<div class="appbar"><h2>${title}</h2></div><div class="body" id="bd">${b}</div>`+tabs();
+  const qi=scr.querySelector("#q");if(qi){qi.oninput=e=>{q=e.target.value;const pos=e.target.selectionStart;render();const n=scr.querySelector("#q");n.focus();n.setSelectionRange(pos,pos)}}
+}
+scr.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.tab){tab=t.dataset.tab;cur=null;render()}
+  else if(t.dataset.r){cur=R.find(r=>r.id==t.dataset.r);Kit.log("GET","firestore · recetas/"+cur.id,"OK");render()}
+  else if(t.dataset.back!==undefined){cur=null;render()}
+  else if(t.dataset.p){const i=t.dataset.p;pantry.has(i)?pantry.delete(i):pantry.add(i);Kit.log("PUT","firestore · users/{uid}/pantry","OK");render()}
+  else if(t.dataset.timer){const r=R.find(x=>x.id==t.dataset.timer);timers.push({n:r.n,s:r.t*60,left:r.t*60,run:true});cur=null;tab="timers";render()}
+  else if(t.dataset.tp){const x=timers[t.dataset.tp];if(x.left===0)x.left=x.s;x.run=!x.run;render()}
+  else if(t.dataset.tx){timers.splice(+t.dataset.tx,1);render()}
+  else if(t.dataset.add5!==undefined){timers.push({n:"Timer rápido",s:300,left:300,run:true});render()}
+});
+setInterval(()=>{let ch=false;timers.forEach(t=>{if(t.run&&t.left>0){t.left--;ch=true;if(t.left===0)t.run=false}});
+  if(ch&&view==="app"&&!cur&&tab==="timers"){scr.querySelectorAll(".tm").forEach((el,i)=>{const t=timers[i];el.querySelector(".t").textContent=t.left===0?"¡Listo!":fmt(t.left);el.classList.toggle("done",t.left===0)})}},1000);
+render();
+</script>
+</body>
+</html>

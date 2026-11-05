@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>API Solicitudes · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kit.css">
+<style>
+:root{
+  --bg:#f4f6f5; --card:#fff; --ink:#1a2421; --muted:#617069; --line:#dce3df; --code:#0f1715;
+  --get:#2f7fd8; --post:#15946b; --put:#d48a12; --py:#3572a5; --body:"Source Sans 3",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  /* layout: documentación tipo Swagger con endpoints desplegables + tabla de datos en vivo */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding:26px 16px 110px}
+.head{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.head h1{margin:0;font:700 30px/1.1 var(--body)}
+.ver{font:600 12px var(--mono);background:#e6efe9;color:var(--post);padding:3px 8px;border-radius:6px}
+.lead{color:var(--muted);max-width:70ch;margin:4px 0 0}
+.sla{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 22px}
+.sla div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px}
+.sla b{font-family:var(--mono)}
+h2{font:700 20px var(--body);margin:26px 0 10px}
+.ep{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.ep>button{all:unset;box-sizing:border-box;width:100%;display:flex;gap:12px;align-items:center;padding:10px 14px;cursor:pointer}
+.ep>button:focus-visible{outline:2px solid var(--get);outline-offset:-2px}
+.m{font:600 12.5px var(--mono);color:#fff;border-radius:6px;padding:4px 0;width:62px;text-align:center;flex:none}
+.m.GET{background:var(--get)}.m.POST{background:var(--post)}.m.PUT{background:var(--put)}
+.path{font:600 14.5px var(--mono)}
+.desc{color:var(--muted);font-size:14px;flex:1;text-align:right}
+.ep.GET{border-left:4px solid var(--get)}.ep.POST{border-left:4px solid var(--post)}.ep.PUT{border-left:4px solid var(--put)}
+.box{padding:4px 14px 16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.box label{display:block;font:600 13px var(--body);color:var(--muted);margin:10px 0 4px}
+.box input,.box select,.box textarea{width:100%;font:500 13.5px var(--mono);border:1px solid var(--line);border-radius:8px;padding:8px;background:#fbfcfb;color:var(--ink)}
+.box textarea{min-height:150px;resize:vertical}
+.exec{margin-top:12px;border:0;background:var(--ink);color:#fff;border-radius:8px;padding:9px 16px;font:600 14px var(--body);cursor:pointer}
+.res{background:var(--code);color:#d7e5df;border-radius:10px;padding:12px;font:12.5px/1.5 var(--mono);overflow:auto;max-height:340px;white-space:pre;margin-top:10px}
+.code{display:inline-block;font:600 12px var(--mono);padding:2px 8px;border-radius:5px;background:#dff3ea;color:var(--post)}
+.code.e{background:#fde4e1;color:#c0392b}
+.k{color:#8fd0ff}.s{color:#b6e39a}.n{color:#ffc66d}.nl{color:#c58cff}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+.tw{overflow-x:auto}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums}
+th{font:600 12px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.8px;background:#fafcfb}
+.st{font:600 12px var(--body);padding:2px 9px;border-radius:99px;background:#eef1ef}
+.st.Pendiente{background:#fff1d6;color:#8a5a00}.st.Asignada{background:#e2ecfb;color:#1d5ab4}.st.En{background:#ede4fb;color:#6a3fb4}.st.Resuelta{background:#dff3ea;color:#0f7a54}.st.Cerrada{background:#eceeed;color:#5b6660}
+.py{background:var(--code);color:#d7e5df;border-radius:12px;padding:14px;font:12.5px/1.55 var(--mono);overflow:auto;white-space:pre}
+[hidden]{display:none!important}
+@media (max-width:760px){.box{grid-template-columns:1fr}.desc{display:none}}
+</style>
+</head>
+<body data-title="API de Solicitudes y Reportes" data-sub="Backend para consultora · SLA automático" data-stack="Python,FastAPI,SQLite,Pydantic,Uvicorn" data-repo="https://github.com/Federicoegas001/Api-Gestion-de-solicitudes-y-reportes" data-note="proyecto grupal (Grupo 2); este playground ejecuta los endpoints contra una base simulada en tu navegador, como el Swagger de FastAPI.">
+<div class="wrap">
+  <div class="head"><h1>Gestión de Solicitudes y Reportes</h1><span class="ver">OAS 3.1 · v1.0</span></div>
+  <p class="lead">API para que los clientes de una consultora carguen modificaciones, reclamos y pedidos de upgrade. Al crear una solicitud consulta el plan del cliente en la API del Equipo 1 y le asigna el SLA.</p>
+  <div class="sla"><div>Premium → <b>4 hs</b></div><div>Profesional → <b>24 hs</b></div><div>Básico → <b>48 hs</b></div><div>Flujo: <b>Pendiente → Asignada → En Proceso → Resuelta → Cerrada</b></div></div>
+
+  <h2>solicitudes</h2>
+  <div id="eps-s"></div>
+  <h2>reportes</h2>
+  <div id="eps-r"></div>
+
+  <h2>Tabla <code style="font:600 16px var(--mono)">solicitudes</code> en vivo</h2>
+  <div class="tw"><table><thead><tr><th>id</th><th>categoría</th><th>cliente</th><th>estado</th><th>prioridad</th><th>SLA est.</th><th>real</th><th>consultor</th></tr></thead><tbody id="tbl"></tbody></table></div>
+
+  <h2>Así se ve el endpoint en FastAPI</h2>
+  <div class="py" id="py"></div>
+</div>
+<script src="../assets/kit.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const clientes={1:{n:"Solange Asistente",plan:"Básico"},2:{n:"Distribuidora Norte",plan:"Profesional"},3:{n:"Grupo Andino",plan:"Premium"}};
+const planes={1:"Básico",2:"Profesional",3:"Premium"},SLA={"Premium":4,"Profesional":24,"Básico":48};
+const consultores={1:"Ana Torres",2:"Luis Paz"};
+let db=[
+ {id_solicitud:1,descripcion:"El módulo de descarga de reportes no funciona",categoria:"Reclamo",id_cliente:2,id_plan:null,estado:"En Proceso",prioridad:"Alta",fecha_creacion:"2026-11-03T10:12:00",fecha_resolucion:null,tiempo_estimado_resolucion:24,tiempo_real_resolucion:null,id_consultor:1},
+ {id_solicitud:2,descripcion:"Cambiar la reunión semanal al jueves",categoria:"Modificación",id_cliente:1,id_plan:null,estado:"Resuelta",prioridad:"Baja",fecha_creacion:"2026-11-02T09:00:00",fecha_resolucion:"2026-11-03T15:00:00",tiempo_estimado_resolucion:48,tiempo_real_resolucion:30,id_consultor:2},
+ {id_solicitud:3,descripcion:"Quiero pasar al plan Premium",categoria:"Upgrade",id_cliente:2,id_plan:3,estado:"Pendiente",prioridad:"Media",fecha_creacion:"2026-11-04T18:40:00",fecha_resolucion:null,tiempo_estimado_resolucion:24,tiempo_real_resolucion:null,id_consultor:null},
+];
+const prio={Reclamo:"Alta",Upgrade:"Media","Modificación":"Baja"};
+function hl(o){return JSON.stringify(o,null,2).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?/g,(m,s,c,l)=>s?(c?`<span class="k">${s}</span>${c}`:`<span class="s">${s}</span>`):l?`<span class="nl">${m}</span>`:`<span class="n">${m}</span>`)}
+const err=(code,detail)=>({code,body:{detail}});
+const find=id=>db.find(s=>s.id_solicitud===+id);
+const EPS=[
+ {g:"s",m:"POST",p:"/solicitudes/",d:"Crear una solicitud",body:{descripcion:"Quiero cambiar al plan Profesional para obtener mejor SLA",categoria:"Upgrade",id_cliente:1,id_plan:2},
+  run:(q,b)=>{if(!clientes[b.id_cliente])return err(400,"El cliente especificado no existe.");if(b.id_plan!=null&&!planes[b.id_plan])return err(400,"El plan especificado no existe.");
+   if(!["Modificación","Reclamo","Upgrade"].includes(b.categoria))return err(422,"categoria debe ser Modificación, Reclamo o Upgrade");
+   const s={id_solicitud:db.length?Math.max(...db.map(x=>x.id_solicitud))+1:1,descripcion:b.descripcion,categoria:b.categoria,id_cliente:b.id_cliente,id_plan:b.id_plan??null,estado:"Pendiente",prioridad:prio[b.categoria],fecha_creacion:new Date().toISOString().slice(0,19),fecha_resolucion:null,tiempo_estimado_resolucion:SLA[clientes[b.id_cliente].plan],tiempo_real_resolucion:null,id_consultor:null};db.push(s);return{code:200,body:s,calls:[["GET","equipo1:5000/clientes/"+b.id_cliente,200]]}}},
+ {g:"s",m:"GET",p:"/solicitudes/",d:"Listar solicitudes (filtro por estado)",q:[["estado","","sel",["","Pendiente","Asignada","En Proceso","Resuelta","Cerrada"]]],run:q=>({code:200,body:db.filter(s=>!q.estado||s.estado===q.estado)})},
+ {g:"s",m:"GET",p:"/solicitudes/{id_solicitud}",d:"Ver detalle",q:[["id_solicitud","1"]],run:q=>find(q.id_solicitud)?{code:200,body:find(q.id_solicitud)}:err(404,"Solicitud no encontrada")},
+ {g:"s",m:"PUT",p:"/solicitudes/{id_solicitud}/estado",d:"Cambiar estado y asignar consultor",q:[["id_solicitud","3"],["nuevo_estado","Asignada","sel",["Pendiente","Asignada","En Proceso","Resuelta","Cerrada"]],["id_consultor","1"]],
+  run:q=>{const s=find(q.id_solicitud);if(!s)return err(404,"Solicitud no encontrada");if(q.id_consultor&&!consultores[q.id_consultor])return err(400,"El consultor no existe");s.estado=q.nuevo_estado;if(q.id_consultor)s.id_consultor=+q.id_consultor;return{code:200,body:s}}},
+ {g:"s",m:"PUT",p:"/solicitudes/{id_solicitud}/resolver",d:"Marcar como resuelta con tiempo real",q:[["id_solicitud","1"],["tiempo_real","20"]],
+  run:q=>{const s=find(q.id_solicitud);if(!s)return err(404,"Solicitud no encontrada");s.estado="Resuelta";s.tiempo_real_resolucion=+q.tiempo_real;s.fecha_resolucion=new Date().toISOString().slice(0,19);return{code:200,body:s}}},
+ {g:"r",m:"GET",p:"/reportes/planes-contratados",d:"Plan de cada cliente",run:()=>({code:200,body:Object.entries(clientes).map(([id,c])=>({id_cliente:+id,nombre_cliente:c.n,plan:c.plan,tiempo_respuesta_hs:SLA[c.plan]})),calls:[["GET","equipo1:5000/clientes",200]]})},
+ {g:"r",m:"GET",p:"/reportes/reclamos",d:"Reclamos y cumplimiento de SLA",run:()=>({code:200,body:db.filter(s=>s.categoria==="Reclamo").map(s=>({id_solicitud:s.id_solicitud,cliente:clientes[s.id_cliente].n,estado:s.estado,sla_hs:s.tiempo_estimado_resolucion,real_hs:s.tiempo_real_resolucion,cumple_sla:s.tiempo_real_resolucion==null?null:s.tiempo_real_resolucion<=s.tiempo_estimado_resolucion}))})},
+ {g:"r",m:"GET",p:"/reportes/actividad-clientes",d:"Solicitudes por cliente",run:()=>({code:200,body:Object.entries(clientes).map(([id,c])=>{const l=db.filter(s=>s.id_cliente==id);return{cliente:c.n,total:l.length,reclamos:l.filter(s=>s.categoria==="Reclamo").length,upgrades:l.filter(s=>s.categoria==="Upgrade").length,modificaciones:l.filter(s=>s.categoria==="Modificación").length}})})},
+];
+function epHTML(e,i){const params=(e.q||[]).map(([k,v,t,opts])=>`<label for="p${i}-${k}">${k}</label>`+(t==="sel"?`<select id="p${i}-${k}" data-k="${k}">${opts.map(o=>`<option ${o===v?"selected":""} value="${o}">${o||"(sin filtro)"}</option>`).join("")}</select>`:`<input id="p${i}-${k}" data-k="${k}" value="${v}">`)).join("");
+  return `<div class="ep ${e.m}"><button aria-expanded="${i===0}" data-tg="${i}"><span class="m ${e.m}">${e.m}</span><span class="path">${e.p}</span><span class="desc">${e.d}</span></button>
+  <div class="box" id="b${i}" ${i===0?"":"hidden"}><div>${params}${e.body?`<label for="body${i}">Request body (JSON)</label><textarea id="body${i}">${JSON.stringify(e.body,null,2)}</textarea>`:""}${!params&&!e.body?'<p style="color:var(--muted);margin:10px 0 0">Sin parámetros.</p>':""}<button class="exec" data-ex="${i}">Execute</button></div>
+  <div><label>Respuesta</label><div id="r${i}"><div class="res" style="color:#6e827a">Tocá Execute para llamar al endpoint.</div></div></div></div></div>`}
+function exec(i){const e=EPS[i],q={};document.querySelectorAll(`#b${i} [data-k]`).forEach(x=>q[x.dataset.k]=x.value);
+  let b=null;if(e.body){try{b=JSON.parse(document.getElementById("body"+i).value)}catch{show(i,{code:422,body:{detail:"JSON inválido en el body"}});return}}
+  const r=e.run(q,b);(r.calls||[]).forEach(c=>Kit.log(...c));
+  let path=e.p.replace(/\{(\w+)\}/g,(m,k)=>q[k]);const qs=Object.entries(q).filter(([k,v])=>v&&!e.p.includes("{"+k+"}")).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
+  Kit.log(e.m,path+(qs?"?"+qs:""),r.code);show(i,r);table()}
+function show(i,r){document.getElementById("r"+i).innerHTML=`<span class="code ${r.code>=400?"e":""}">${r.code} ${r.code>=400?"Error":"OK"}</span><div class="res">${hl(r.body)}</div>`}
+function table(){$("#tbl").innerHTML=db.map(s=>`<tr><td>${s.id_solicitud}</td><td>${s.categoria}</td><td>${clientes[s.id_cliente].n}</td><td><span class="st ${s.estado.split(" ")[0]}">${s.estado}</span></td><td>${s.prioridad}</td><td>${s.tiempo_estimado_resolucion} hs</td><td>${s.tiempo_real_resolucion??"–"}${s.tiempo_real_resolucion!=null?" hs":""}</td><td>${consultores[s.id_consultor]||"–"}</td></tr>`).join("")}
+$("#eps-s").innerHTML=EPS.map((e,i)=>e.g==="s"?epHTML(e,i):"").join("");
+$("#eps-r").innerHTML=EPS.map((e,i)=>e.g==="r"?epHTML(e,i):"").join("");
+document.addEventListener("click",ev=>{const t=ev.target.closest("[data-tg],[data-ex]");if(!t)return;
+  if(t.dataset.tg){const b=document.getElementById("b"+t.dataset.tg);b.hidden=!b.hidden;t.setAttribute("aria-expanded",!b.hidden)}
+  else exec(+t.dataset.ex)});
+$("#py").textContent=`# app/api/solicitudes.py
+@router.post("/", response_model=SolicitudResponse)
+def api_crear_solicitud(solicitud: SolicitudCreate):
+    """Crea una nueva solicitud de servicio (CU-01)"""
+    conn = get_db_connection()
+    try:
+        # Validar si el cliente existe en la API del Equipo 1
+        cliente = equipo1.get_cliente(solicitud.id_cliente)
+        if not cliente:
+            raise HTTPException(status_code=400, detail="El cliente especificado no existe.")
+
+        # Si es un upgrade, validar que el plan solicitado exista en la API del Equipo 1
+        if solicitud.id_plan is not None:
+            plan = equipo1.get_plan(solicitud.id_plan)
+            if not plan:
+                raise HTTPException(status_code=400, detail="El plan especificado no existe.")
+
+        return crear_solicitud(conn, solicitud)
+    finally:
+        conn.close()`;
+table();exec(0);
+</script>
+</body>
+</html>
